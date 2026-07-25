@@ -1,0 +1,198 @@
+:root {
+    --bg: #0a0a0a; --surface: #111; --border: #1f1f1f;
+    --text: #f0f0f0; --muted: #666; --accent: #c8f04d; --accent2: #7c5cfc;
+    --radius: 14px; --font-ui: 'Inter', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: var(--bg); color: var(--text); font-family: var(--font-ui);
+    min-height: 100vh; display: flex;
+}
+/* LEFT PANEL */
+.left {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 48px;
+    background: radial-gradient(ellipse 80% 60% at 30% 60%, rgba(124,92,252,.18) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 70% 30%, rgba(200,240,77,.10) 0%, transparent 60%);
+    position: relative;
+    overflow: hidden;
+}
+.left-inner { max-width: 460px; width: 100%; }
+.logo { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--accent); margin-bottom: 12px; }
+.logo span { color: var(--text); }
+.tagline { color: var(--muted); font-size: 14px; margin-bottom: 48px; }
+
+/* TABS */
+.tabs { display: flex; gap: 0; margin-bottom: 32px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.tab {
+    flex: 1; text-align: center; padding: 11px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all .15s; color: var(--muted); background: transparent;
+    border: none;
+}
+.tab.active { background: var(--accent); color: #0a0a0a; }
+
+/* FORM */
+.form { display: flex; flex-direction: column; gap: 16px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+input {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 13px 16px; color: var(--text);
+    font-size: 15px; font-family: var(--font-ui);
+    transition: border-color .15s; outline: none;
+}
+input:focus { border-color: var(--accent); }
+input::placeholder { color: var(--muted); }
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.btn-primary {
+    margin-top: 8px; padding: 14px; border: none; border-radius: 10px;
+    background: var(--accent); color: #0a0a0a; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .85; }
+.divider { display: flex; align-items: center; gap: 12px; margin: 4px 0; color: var(--muted); font-size: 12px; }
+.divider::before, .divider::after { content:''; flex:1; height:1px; background: var(--border); }
+.btn-google {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 13px; border: 1px solid var(--border); border-radius: 10px;
+    background: transparent; color: var(--text); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: background .15s; font-family: var(--font-ui);
+}
+.btn-google:hover { background: var(--surface); }
+.terms { font-size: 12px; color: var(--muted); text-align: center; margin-top: 4px; }
+.terms a { color: var(--accent); text-decoration: none; }
+
+/* RIGHT PANEL – decorative mockup */
+.right {
+    width: 420px; background: var(--surface); border-left: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; padding: 40px;
+    position: relative; overflow: hidden;
+}
+.phone {
+    width: 220px; height: 420px; background: #0a0a0a;
+    border: 2px solid var(--border); border-radius: 36px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,.6);
+}
+.phone-notch {
+    width: 80px; height: 24px; background: var(--surface);
+    border-radius: 0 0 16px 16px; margin: 0 auto;
+}
+.phone-feed { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+.phone-stories { display: flex; gap: 8px; overflow: hidden; margin-bottom: 4px; }
+.phone-story {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--accent);
+}
+.phone-story:nth-child(1) { background: linear-gradient(135deg,#7c5cfc,#c8f04d); }
+.phone-story:nth-child(2) { background: linear-gradient(135deg,#fc5c7d,#6a82fb); }
+.phone-story:nth-child(3) { background: linear-gradient(135deg,#f7971e,#ffd200); }
+.phone-story:nth-child(4) { background: linear-gradient(135deg,#56ccf2,#2f80ed); }
+.phone-card {
+    background: var(--surface); border-radius: 10px; overflow: hidden;
+}
+.phone-card-img {
+    width: 100%; height: 140px;
+}
+.phone-card-img.a { background: linear-gradient(135deg,#7c5cfc 0%,#c8f04d 100%); }
+.phone-card-img.b { background: linear-gradient(135deg,#fc5c7d 0%,#ffd200 100%); }
+.phone-card-meta { padding: 8px; display: flex; gap: 8px; align-items: center; }
+.phone-mini-av { width: 20px; height: 20px; border-radius: 50%; background: var(--border); }
+.phone-line { height: 6px; border-radius: 3px; background: var(--border); flex: 1; }
+.floating-tag {
+    position: absolute; background: var(--accent); color: #0a0a0a;
+    font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 20px;
+}
+.floating-tag.t1 { top: 60px; right: -10px; transform: rotate(6deg); }
+.floating-tag.t2 { bottom: 100px; left: -10px; transform: rotate(-4deg); }
+
+/* register panel hidden by default */
+#register-form { display: none; }
+
+.password-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.password-hint {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    background: #333;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: opacity 0.2s, visibility 0.2s;
+    z-index: 10;
+}
+
+/* Arrow */
+.password-hint::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 20px;
+    border: 6px solid transparent;
+    border-top-color: #333;
+}
+
+/* Show hint when hovering over the input */
+.password-wrapper input:hover + .password-hint,
+.password-wrapper input:focus + .password-hint {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Keep hint visible when hovering the hint itself */
+.password-hint:hover {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/* ALERTS */
+.alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: var(--font-ui);
+    margin-bottom: 16px;
+    border: 1px solid;
+    line-height: 1.5;
+}
+.alert svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.alert ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.alert ul li::before {
+    content: "•";
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+/* Success */
+.alert-success {
+    background: rgba(200, 240, 77, 0.06);
+    border-color: rgba(200, 240, 77, 0.25);
+    color: var(--accent);
+}
+
+/* Error */
+.alert-error {
+    background: rgba(252, 92, 125, 0.06);
+    border-color: rgba(252, 92, 125, 0.25);
+    color: #fc5c7d;
+}
