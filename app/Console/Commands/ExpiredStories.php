@@ -33,7 +33,11 @@ class ExpiredStories extends Command
             'status' => 'archived'
         ]);
 
-        $this->info("{$expiredCount} stories expired that were there for 24+ hours.");
+        $message = "{$expiredCount} stories expired that were there for 24+ hours.";
+
+        $this->info($message);
+
+        \Illuminate\Log\log($message);
 
         return Command::SUCCESS;
     }
