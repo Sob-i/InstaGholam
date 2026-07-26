@@ -22,7 +22,6 @@ class postsDashboardController extends Controller
             ->latest()
             ->get();
     }
-
     public function search(Request $request)
     {
         $search = $request->input('search');
@@ -84,7 +83,6 @@ class postsDashboardController extends Controller
     {
         return postModel::where('id', $postId)->update(['status' => $status]);
     }
-
     public function postStatusToFlagged($postId)
     {
         $affectedPost = $this->changeStatus($postId, 'flagged');

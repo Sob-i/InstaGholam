@@ -24,12 +24,11 @@ class postController extends Controller
     public function showPost($post_id){
 
         $user = User::where('id', Auth::id())->first();
-        $post = PostModel::where('id', $post_id)->with('user')->first();
+        $post = PostModel::where('id', $post_id)->where('status','active')->with('user')->first();
         $postWithInfo = $this->postServices->ShowSinglePost($user,$post);
 
         return view('index.postSingle.single', compact( 'user','postWithInfo','post'));
     }
-
     public function createPost(postCreateReqeust $request){
            $user = Auth::user();
            $data = [

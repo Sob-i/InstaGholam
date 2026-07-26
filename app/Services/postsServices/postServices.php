@@ -62,7 +62,6 @@ class postServices
             'isCloseFriend' => $isCloseFriend
         ];
     }
-
     public function ShowAllPosts($user)
     {
         $followingIds = followsModel::where('follower_id', $user->id)
@@ -79,7 +78,20 @@ class postServices
             ->orderBy('created_at', 'asc')
             ->with('user')
             ->get()
-            ->unique('user_id');
+            ->filter(function ($story) use ($user, $isCloseFriendsId) {
+
+                if ($story->audience === 'followers') {
+                    return true;
+                }
+
+                if ($story->user_id == $user->id) {
+                    return true;
+                }
+
+                return in_array($user->id, $isCloseFriendsId);
+            })
+            ->unique('user_id')
+            ->values();
 
         $allStories = storyModel::whereIn('user_id', $followingIds)
             ->where('status', 'active')
@@ -87,7 +99,7 @@ class postServices
             ->with('user')
             ->get();
 
-        $posts = postModel::whereIn('user_id', $followingIds)
+        $posts = postModel::whereIn('user_id', $followingIds)->where('status', 'active')
             ->with([
                 'user',
                 'comments' => function ($query) {
@@ -147,7 +159,6 @@ class postServices
             'isCloseFriendsId' => $isCloseFriendsId,
         ];
     }
-
     public function CreatePost($data)
     {
         try {
@@ -182,7 +193,6 @@ class postServices
         $timestamp = date('Y-m-d',time());
         $file->move(public_path("users/posts/$folderName-posts/$timestamp"), $fileName);
     }
-
     public function AddComment($data)
     {
         $comment = commentModel::create([

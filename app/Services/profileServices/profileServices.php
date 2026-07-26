@@ -24,7 +24,7 @@ class profileServices
 
     public function ShowProfile($user)
     {
-        $posts = PostModel::where('user_id', $user->id)->with('comments')->orderBy('created_at', 'desc')->get();
+        $posts = PostModel::where('user_id', $user->id)->where('status','active')->with('comments')->orderBy('created_at', 'desc')->get();
         $savedPosts  = postsSaveModel::where('user_id', $user->id)->with('post')->orderBy('created_at', 'desc')->get();
         $postsCount = $posts->count();
         $followersCount = $user->followers;

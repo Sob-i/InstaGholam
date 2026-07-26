@@ -361,14 +361,8 @@
                         <img src="" class="story-user-avatar" id="storyUserAvatar" alt="">
                         <span class="story-username" id="storyUsername"></span>
                         <span class="story-time" id="storyTime"></span>
+                        <span class="story-username" id="storyCloseFriend" style="background-color: green"></span>
                     </div>
-                    <button class="story-more-btn">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <circle cx="12" cy="5" r="1"/>
-                            <circle cx="12" cy="12" r="1"/>
-                            <circle cx="12" cy="19" r="1"/>
-                        </svg>
-                    </button>
                 </div>
 
                 <!-- Progress Bar -->
@@ -409,7 +403,6 @@
         <script>
             const rawStories = @json($storiesJson);
             const currentUserId = @json(auth()->id());
-            console.log(rawStories)
             let filteredStories = [];
             rawStories.forEach(story => {
                 if (story.audience === 'closeFriends' && story.is_close_friend === false) {
@@ -430,6 +423,7 @@
                 const storyUserAvatar = document.getElementById('storyUserAvatar');
                 const storyUsername = document.getElementById('storyUsername');
                 const storyTime = document.getElementById('storyTime');
+                const storyCloseFriend = document.getElementById('storyCloseFriend');
                 const storyPrev = document.getElementById('storyPrev');
                 const storyNext = document.getElementById('storyNext');
 
@@ -521,6 +515,14 @@
                     storyUserAvatar.src = `/users/avatar/${story.user.avatar}`;
                     storyUsername.textContent = story.user.username;
                     storyTime.textContent = story.created_at;
+                    if (story.audience === 'closeFriends') {
+                        storyCloseFriend.textContent = '★';
+                        storyCloseFriend.style.display = 'inline-block';
+                    } else {
+                        storyCloseFriend.textContent = '';
+                        storyCloseFriend.style.display = 'none';
+                    }
+
 
                     const mediaUrl = `/users/stories/${story.media_type}/${story.email_prefix}/${story.media}`;
                     const isVideo = story.media_type === 'video' || mediaUrl.match(/\.(mp4|mov|avi|webm)$/i);
@@ -545,7 +547,6 @@
 
                             // Listen for video end
                             currentVideo.addEventListener('ended', function() {
-                                console.log('Video ended, going to next story');
                                 if (!videoEnded) {
                                     videoEnded = true;
                                     markCurrentComplete();
@@ -694,7 +695,6 @@
                 }
 
                 function nextStory() {
-                    console.log('nextStory called, current index:', currentStoryIndex, 'total:', currentStories.length);
                     clearInterval(progressInterval);
 
                     if (currentVideo) {
@@ -708,12 +708,10 @@
 
                     if (currentStoryIndex < currentStories.length - 1) {
                         currentStoryIndex++;
-                        console.log('Moving to story index:', currentStoryIndex);
                         updateStoryUI();
                         createProgressBars();
                         startProgress();
                     } else {
-                        console.log('No more stories, closing viewer');
                         closeStoryViewer();
                     }
                 }
