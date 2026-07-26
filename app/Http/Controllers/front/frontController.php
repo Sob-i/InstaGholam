@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\front;
 
 use App\Http\Controllers\Controller;
+use App\Models\notifications\notificationModel;
 use App\Models\User;
 use App\Services\postsServices\postServices;
 use App\Services\profileServices\profileServices;
@@ -24,6 +25,19 @@ class frontController extends Controller
     {
         $user = Auth::user();
         return view('index.newPost.newPost', compact('user'));
+    }
+
+    public function newStoryShow()
+    {
+        $user = Auth::user();
+        return view('index.newStory.newStory', compact('user'));
+    }
+
+    public function notificationsShow()
+    {
+        $user = Auth::user();
+        $notifications = notificationModel::where('target_user_id' , $user->id)->with(['user:id,username,avatar,email', 'post'])->orderBy('created_at', 'desc')->get();
+        return view('index.notifications.notifications', compact('user', 'notifications'));
     }
 
     public function profile($username)

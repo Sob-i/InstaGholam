@@ -7,9 +7,9 @@ use App\Http\Controllers\auth\authController;
 use App\Http\Controllers\front\frontController;
 use App\Http\Controllers\front\profile\profileController;
 use App\Http\Controllers\front\posts\postController;
-use App\Http\Controllers\front\comments\commentController;
 use App\Http\Controllers\front\posts\postsLikeController;
 use App\Http\Controllers\front\posts\postsSaveController;
+use App\Http\Controllers\front\comments\commentController;
 use App\Http\Controllers\front\follow\followController;
 use App\Http\Controllers\front\explore\exploreController;
 use App\Http\Controllers\front\story\storyController;
@@ -18,7 +18,10 @@ use App\Http\Controllers\admin\adminDashboardController;
 use App\Http\Controllers\admin\adminDashboard\usersDashboardController;
 use App\Http\Controllers\admin\adminDashboard\postsDashboardController;
 
-    // LoginForm
+use App\Http\Controllers\front\notifications\notificationController;
+
+
+    // Login && SignUp Form
     Route::get('', [authController::class, 'showLoginAndSingUpForm'])->name('login');
 
     Route::prefix('auth')->group(function () {
@@ -36,11 +39,26 @@ Route::middleware('auth')->group(function () {
         // Index
         Route::get('index', [frontController::class, 'index'])->name('homepage');
 
+        // Explore
+        Route::get('explore', [exploreController::class, 'showExplore'])->name('explore');
+        Route::get('explore/search', [exploreController::class, 'search'])->name('explore.search');
+
         // Post
         Route::get('post/{id}', [postController::class, 'showPost'])->name('post.show');
         Route::post('post/{id}/comments', [commentController::class, 'sendComment'])->name('post.comment.send');
         Route::post('/post/{post}/like', [postsLikeController::class, 'toggle'])->name('post.like');
         Route::post('/post/{post}/save', [postsSaveController::class, 'toggle'])->name('post.save');
+
+        // New Post
+        Route::get('newPost', [frontController::class, 'newPost'])->name('newPost');
+        Route::post('newPost/create', [postController::class, 'createPost'])->name('newPost.create');
+
+        // Story
+        Route::get('newStory', [frontController::class, 'newStoryShow'])->name('story.new.show');
+        Route::post('newStory/add', [storyController::class, 'newStory'])->name('story.new');
+
+        // Notifications
+        Route::get('notifications', [frontController::class, 'notificationsShow'])->name('notifications.show');
 
         // Profile
         Route::get('profile/{username}', [frontController::class, 'profile'])->name('profile');
@@ -51,18 +69,6 @@ Route::middleware('auth')->group(function () {
         Route::post('profile/{username}/follow', [followController::class, 'toggle'])->name('profile.user.follow');
         Route::get('profile/{username}/closeFriends', [profileController::class, 'closeFriendShow'])->name('profile.closeFriend.show');
         Route::post('profile/{username}/closeFriends', [profileController::class, 'toggle'])->name('profile.closeFriend.toggle');
-
-        // New Post
-        Route::get('newPost', [frontController::class, 'newPost'])->name('newPost');
-        Route::post('newPost/create', [postController::class, 'createPost'])->name('newPost.create');
-
-        // Story
-        Route::get('newStory', [storyController::class, 'newStoryShow'])->name('story.new.show');
-        Route::post('newStory/add', [storyController::class, 'newStory'])->name('story.new');
-
-        // Explore
-        Route::get('explore', [exploreController::class, 'showExplore'])->name('explore');
-        Route::get('explore/search', [exploreController::class, 'search'])->name('explore.search');
 
     });
 

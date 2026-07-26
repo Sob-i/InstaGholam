@@ -13,11 +13,6 @@ class storyController extends Controller
     {
 
     }
-    public function newStoryShow()
-    {
-        $user = Auth::user();
-        return view('index.newStory.newStory', compact('user'));
-    }
 
     public function newStory(Request $request)
     {

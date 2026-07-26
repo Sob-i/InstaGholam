@@ -1,3 +1,4 @@
+
 @extends('layouts.front.notifications.main')
 @section('content')
     <div class="main">
@@ -14,46 +15,49 @@
         <!-- NEW -->
         <div class="notif-section">
             <div class="notif-section-label">New</div>
-
-            <div class="notif-item unread">
-                <div class="notif-av"><div class="av a"></div><div class="notif-badge badge-heart">♥</div></div>
-                <div class="notif-content">
-                    <div class="notif-text"><strong>maya_k</strong> and 341 others liked your photo.</div>
-                    <div class="notif-time">2 minutes ago</div>
+            @forelse($notifications as $notification)
+                @php
+                    $firstFile = strtok($notification->post->post_files, ',');
+                    $fileExtension = strtolower(pathinfo($firstFile, PATHINFO_EXTENSION));
+                    $isVideo = in_array($fileExtension, ['mp4', 'mov', 'avi', 'webm']);
+                    $postPath = 'users/posts/' . strstr($notification->user->email, '@', true) . '-posts/' . $notification->post->created_at->format('Y-m-d') . '/' . $firstFile;
+                @endphp
+                <div class="notif-item unread">
+                    <div class="notif-av"><img src="{{asset('users/avatar/'.$notification->user->avatar)}}" class="sidebar-avatar">
+                        @if($notification->type == 'like')
+                            <div class="notif-badge badge-heart">♥</div>
+                        @elseif($notification->type == 'comment')
+                            <div class="notif-badge badge-comment">💬</div>
+                        @elseif($notification->type == 'tagged')
+                            <div class="notif-badge badge-tag">🏷</div>
+                        @elseif($notification->type == 'follow')
+                            <div class="notif-badge badge-follow">+</div>
+                        @endif
+                    </div>
+                    <div class="notif-content">
+                        <div class="notif-text"><strong>{{$notification->user->username}}</strong> {{$notification->message}}</div>
+                        <div class="notif-time">{{$notification->created_at->diffForHumans()}}</div>
+                    </div>
+                    <a href="{{route('post.show',$notification->post->id)}}" class="notif-thumb t1">
+                        @if($isVideo)
+                            <video style="object-fit: cover; object-position: center; width: 100%; height: 100%; pointer-events: none;"
+                                   muted
+                                   preload="metadata"
+                                   disablepictureinpicture
+                                   disableremoteplayback>
+                                <source src="{{ asset($postPath) }}" type="video/{{ $fileExtension }}">
+                            </video>
+                        @else
+                            <img src="{{ asset($postPath) }}"
+                                 alt="Post image"
+                                 loading="lazy"
+                                 style="object-fit: cover; object-position: center; width: 100%; height: 100%;">
+                        @endif
+                    </a>
+                    <div class="unread-dot"></div>
                 </div>
-                <div class="notif-thumb t1"></div>
-                <div class="unread-dot"></div>
-            </div>
-
-            <div class="notif-item unread">
-                <div class="notif-av"><div class="av b"></div><div class="notif-badge badge-comment">💬</div></div>
-                <div class="notif-content">
-                    <div class="notif-text"><strong>sunseeker</strong> commented: "this is absolutely insane 🔥 the colors!"</div>
-                    <div class="notif-time">8 minutes ago</div>
-                </div>
-                <div class="notif-thumb t2"></div>
-                <div class="unread-dot"></div>
-            </div>
-
-            <div class="notif-item unread">
-                <div class="notif-av"><div class="av c"></div><div class="notif-badge badge-follow">+</div></div>
-                <div class="notif-content">
-                    <div class="notif-text"><strong>drone.life</strong> started following you.</div>
-                    <div class="notif-time">22 minutes ago</div>
-                </div>
-                <button class="follow-btn">Follow back</button>
-                <div class="unread-dot"></div>
-            </div>
-
-            <div class="notif-item unread">
-                <div class="notif-av"><div class="av d"></div><div class="notif-badge badge-tag">🏷</div></div>
-                <div class="notif-content">
-                    <div class="notif-text"><strong>lena_arts</strong> tagged you in a photo.</div>
-                    <div class="notif-time">1 hour ago</div>
-                </div>
-                <div class="notif-thumb t1"></div>
-                <div class="unread-dot"></div>
-            </div>
+            @empty
+            @endforelse
         </div>
 
         <!-- THIS WEEK -->

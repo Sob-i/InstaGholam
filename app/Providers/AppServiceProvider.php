@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\comments\commentModel;
+use App\Models\posts\postsLikeModel;
+use App\Observers\commentObserver;
+use App\Observers\likeObserver;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,5 +25,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+        postsLikeModel::observe(likeObserver::class);
+        commentModel::observe(commentObserver::class);
+
     }
 }

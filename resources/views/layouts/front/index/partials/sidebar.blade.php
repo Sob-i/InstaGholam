@@ -15,7 +15,7 @@
         <a href="{{route('story.new.show')}}" class="nav-link">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Add Story
         </a>
-        <a href="notifications.html" class="nav-link">
+        <a href="{{route('notifications.show')}}" class="nav-link">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Notifications
         </a>
         <a href="messages.html" class="nav-link">
