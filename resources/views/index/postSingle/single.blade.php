@@ -14,9 +14,9 @@
                         <div class="post-location">{{$post->post_location}}</div>
                     </div>
                     @if($post->user_id != $user->id)
-                        <button class="btn-edit custom-a {{ $isFollowed ? 'following' : 'not-following' }}"
+                        <button class="btn-edit custom-a {{ $postWithInfo['isFollowed'] ? 'following' : 'not-following' }}"
                                 data-username="{{ $post->user->username }}">
-                            {{ $isFollowed ? 'Following' : 'Follow' }}
+                            {{ $postWithInfo['isFollowed'] ? 'Following' : 'Follow' }}
                         </button>
                     @endif
                     <div class="post-more">

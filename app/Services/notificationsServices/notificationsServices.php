@@ -4,6 +4,7 @@ namespace App\Services\notificationsServices;
 
 
 use App\Models\notifications\notificationModel;
+use App\Models\user\followsModel;
 
 
 class notificationsServices
@@ -17,12 +18,54 @@ class notificationsServices
     }
     public function SendNotification(array $data)
     {
+        switch ($data['type']) {
+
+            case 'follow':
+                notificationModel::where([
+                    'user_id' => $data['user_id'],
+                    'target_user_id' => $data['target_user_id'],
+                    'type' => 'follow',
+                ])->delete();
+                break;
+
+            case 'like':
+                notificationModel::where([
+                    'user_id' => $data['user_id'],
+                    'target_user_id' => $data['target_user_id'],
+                    'post_id' => $data['post_id'],
+                    'type' => 'like',
+                ])->delete();
+                break;
+
+            case 'request':
+                notificationModel::where([
+                    'user_id' => $data['user_id'],
+                    'target_user_id' => $data['target_user_id'],
+                    'post_id' => $data['post_id'],
+                    'type' => 'request',
+                ])->delete();
+                break;
+        }
+
         notificationModel::create([
             'user_id' => $data['user_id'],
-            'post_id' => $data['post_id'],
+            'post_id' => $data['post_id'] ?? null,
             'target_user_id' => $data['target_user_id'],
             'type' => $data['type'],
             'message' => $data['message'],
         ]);
+    }
+    public function NotificationData($user)
+    {
+        $notifications = notificationModel::where('target_user_id' , $user->id)->with(['user:id,username,avatar,email', 'targetUser' ,'post'])->orderBy('created_at', 'desc')->get();
+        foreach ($notifications as $notification) {
+            $notification->isFollowed = false;
+            if ($notification->type === 'follow') {
+                $notification->isFollowed = followsModel::where('follower_id', $user->id)
+                    ->where('followed_id', $notification->user_id)
+                    ->exists();
+            }
+        }
+        return $notifications;
     }
 }

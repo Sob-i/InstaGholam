@@ -5,13 +5,15 @@ namespace App\Http\Controllers\front;
 use App\Http\Controllers\Controller;
 use App\Models\notifications\notificationModel;
 use App\Models\User;
+use App\Models\user\followsModel;
+use App\Services\notificationsServices\notificationsServices;
 use App\Services\postsServices\postServices;
 use App\Services\profileServices\profileServices;
 use Illuminate\Support\Facades\Auth;
 
 class frontController extends Controller
 {
-    public function __construct(protected postServices $postServices , protected profileServices $profileServices)
+    public function __construct(protected postServices $postServices , protected profileServices $profileServices , protected notificationsServices $notificationsServices)
     {
 
     }
@@ -36,7 +38,7 @@ class frontController extends Controller
     public function notificationsShow()
     {
         $user = Auth::user();
-        $notifications = notificationModel::where('target_user_id' , $user->id)->with(['user:id,username,avatar,email', 'post'])->orderBy('created_at', 'desc')->get();
+        $notifications = $this->notificationsServices->NotificationData($user);
         return view('index.notifications.notifications', compact('user', 'notifications'));
     }
 

@@ -17,10 +17,12 @@
             <div class="notif-section-label">New</div>
             @forelse($notifications as $notification)
                 @php
-                    $firstFile = strtok($notification->post->post_files, ',');
-                    $fileExtension = strtolower(pathinfo($firstFile, PATHINFO_EXTENSION));
-                    $isVideo = in_array($fileExtension, ['mp4', 'mov', 'avi', 'webm']);
-                    $postPath = 'users/posts/' . strstr($notification->user->email, '@', true) . '-posts/' . $notification->post->created_at->format('Y-m-d') . '/' . $firstFile;
+                    if (!empty($notification->post->post_files)){
+                        $firstFile = strtok($notification->post->post_files, ',');
+                        $fileExtension = strtolower(pathinfo($firstFile, PATHINFO_EXTENSION));
+                        $isVideo = in_array($fileExtension, ['mp4', 'mov', 'avi', 'webm']);
+                        $postPath = 'users/posts/' . strstr($notification->targetUser->email, '@', true) . '-posts/' . $notification->post->created_at->format('Y-m-d') . '/' . $firstFile;
+                    }
                 @endphp
                 <div class="notif-item unread">
                     <div class="notif-av"><img src="{{asset('users/avatar/'.$notification->user->avatar)}}" class="sidebar-avatar">
@@ -38,22 +40,30 @@
                         <div class="notif-text"><strong>{{$notification->user->username}}</strong> {{$notification->message}}</div>
                         <div class="notif-time">{{$notification->created_at->diffForHumans()}}</div>
                     </div>
-                    <a href="{{route('post.show',$notification->post->id)}}" class="notif-thumb t1">
-                        @if($isVideo)
-                            <video style="object-fit: cover; object-position: center; width: 100%; height: 100%; pointer-events: none;"
-                                   muted
-                                   preload="metadata"
-                                   disablepictureinpicture
-                                   disableremoteplayback>
-                                <source src="{{ asset($postPath) }}" type="video/{{ $fileExtension }}">
-                            </video>
-                        @else
-                            <img src="{{ asset($postPath) }}"
-                                 alt="Post image"
-                                 loading="lazy"
-                                 style="object-fit: cover; object-position: center; width: 100%; height: 100%;">
-                        @endif
-                    </a>
+                    @if($notification->post)
+                        <a href="{{route('post.show',$notification->post->id)}}" class="notif-thumb t1">
+                            @if($isVideo)
+                                <video style="object-fit: cover; object-position: center; width: 100%; height: 100%; pointer-events: none;"
+                                       muted
+                                       preload="metadata"
+                                       disablepictureinpicture
+                                       disableremoteplayback>
+                                    <source src="{{ asset($postPath) }}" type="video/{{ $fileExtension }}">
+                                </video>
+                            @else
+                                <img src="{{ asset($postPath) }}"
+                                     alt="Post image"
+                                     loading="lazy"
+                                     style="object-fit: cover; object-position: center; width: 100%; height: 100%;">
+                            @endif
+                        </a>
+                    @elseif($notification->type == 'follow')
+                        <button class="btn-edit custom-a {{ $notification->isFollowed ? 'following' : 'not-following' }}"
+                                data-username="{{ $notification->user->username }}"
+                                data-follow-url="{{ route('profile.user.follow', $notification->user->username) }}">
+                            {{ $notification->isFollowed  ? 'Following' : 'Follow' }}
+                        </button>
+                    @endif
                     <div class="unread-dot"></div>
                 </div>
             @empty

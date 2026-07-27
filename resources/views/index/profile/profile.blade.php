@@ -32,10 +32,10 @@
                             </div>
                         </div>
                     @else
-                        <button class="btn-edit custom-a {{ $isFollowed ? 'following' : 'not-following' }}"
+                        <button class="btn-edit custom-a {{ $data['isFollowed'] ? 'following' : 'not-following' }}"
                                 data-username="{{ $user->username }}"
                                 data-follow-url="{{ route('profile.user.follow', $user->username) }}">
-                            {{ $isFollowed ? 'Following' : 'Follow' }}
+                            {{ $data['isFollowed'] ? 'Following' : 'Follow' }}
                         </button>
                     @endif
                 </div>
