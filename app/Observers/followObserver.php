@@ -17,13 +17,21 @@ class followObserver
      */
     public function created(followsModel $followsModel): void
     {
-
-        $data = [
-            'user_id' => Auth::user()->id,
-            'target_user_id' => $followsModel->followed_id,
-            'type' => 'follow',
-            'message' => ' started following you.'
-        ];
+        if ($followsModel->status == 'pending') {
+            $data = [
+                'user_id' => Auth::user()->id,
+                'target_user_id' => $followsModel->followed_id,
+                'type' => 'request',
+                'message' => ' wants to follow you.'
+            ];
+        }else{
+            $data = [
+                'user_id' => Auth::user()->id,
+                'target_user_id' => $followsModel->followed_id,
+                'type' => 'follow',
+                'message' => ' started following you.'
+            ];
+        }
         $this->notificationsServices->SendNotification($data);
     }
 

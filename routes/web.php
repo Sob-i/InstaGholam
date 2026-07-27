@@ -18,7 +18,6 @@ use App\Http\Controllers\admin\adminDashboardController;
 use App\Http\Controllers\admin\adminDashboard\usersDashboardController;
 use App\Http\Controllers\admin\adminDashboard\postsDashboardController;
 
-use App\Http\Controllers\front\notifications\notificationController;
 
 
     // Login && SignUp Form
@@ -67,6 +66,7 @@ Route::middleware('auth')->group(function () {
         Route::get('profile/{username}/edit/password', [profileController::class, 'showEditPassword'])->name('profile.edit.password.show');
         Route::put('profile/{username}/edit/password', [profileController::class, 'editPassword'])->name('profile.edit.password');
         Route::post('profile/{username}/follow', [followController::class, 'toggle'])->name('profile.user.follow');
+        Route::put('profile/{id}/follow/acceptRequest', [followController::class, 'accept'])->name('profile.user.follow.accept');
         Route::get('profile/{username}/closeFriends', [profileController::class, 'closeFriendShow'])->name('profile.closeFriend.show');
         Route::post('profile/{username}/closeFriends', [profileController::class, 'toggle'])->name('profile.closeFriend.toggle');
 

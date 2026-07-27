@@ -22,26 +22,22 @@ class frontController extends Controller
         $data = $this->postServices->ShowAllPosts($user);
         return view('index.homePage.homePage', compact('user', 'data'));
     }
-
     public function newPost()
     {
         $user = Auth::user();
         return view('index.newPost.newPost', compact('user'));
     }
-
     public function newStoryShow()
     {
         $user = Auth::user();
         return view('index.newStory.newStory', compact('user'));
     }
-
     public function notificationsShow()
     {
         $user = Auth::user();
         $notifications = $this->notificationsServices->NotificationData($user);
         return view('index.notifications.notifications', compact('user', 'notifications'));
     }
-
     public function profile($username)
     {
         $user = User::where('username', $username)->first();

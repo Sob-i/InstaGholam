@@ -41,7 +41,6 @@ class notificationsServices
                 notificationModel::where([
                     'user_id' => $data['user_id'],
                     'target_user_id' => $data['target_user_id'],
-                    'post_id' => $data['post_id'],
                     'type' => 'request',
                 ])->delete();
                 break;
@@ -59,7 +58,7 @@ class notificationsServices
     {
         $notifications = notificationModel::where('target_user_id' , $user->id)->with(['user:id,username,avatar,email', 'targetUser' ,'post'])->orderBy('created_at', 'desc')->get();
         foreach ($notifications as $notification) {
-            $notification->isFollowed = false;
+            $notification->isFollowed = followsModel::where('follower_id' , $notification->target_user_id)->exists();
             if ($notification->type === 'follow') {
                 $notification->isFollowed = followsModel::where('follower_id', $user->id)
                     ->where('followed_id', $notification->user_id)

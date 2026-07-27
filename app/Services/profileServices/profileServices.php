@@ -22,42 +22,59 @@ class profileServices
 
     }
 
+    private function CanViewProfile(User $viewer, User $owner)
+    {
+        if ($viewer->id == $owner->id)
+            return true;
+
+        if ($owner->privacy == 'public')
+            return true;
+
+        return followsModel::where('follower_id', $viewer->id)
+            ->where('followed_id', $owner->id)
+            ->exists();
+    }
     public function ShowProfile($user)
     {
-        $posts = PostModel::where('user_id', $user->id)->where('status','active')->with('comments')->orderBy('created_at', 'desc')->get();
-        $savedPosts  = postsSaveModel::where('user_id', $user->id)->with('post')->orderBy('created_at', 'desc')->get();
-        $postsCount = $posts->count();
-        $followersCount = $user->followers;
-        $followingCount = $user->following;
-        $isFollowed = false;
-        $followingIds = followsModel::where('follower_id', $user->id)
-            ->pluck('followed_id')
-            ->toArray();
-        $m[] = closeFriendModel::wherein('friend_id', $followingIds)
-            ->where('user_id', $user->id)
-            ->exists();
-        $m[] = Auth::id();
-
-        if (in_array($user->id, $m)) {
-            $isCloseFriend = true;
-        } else {
-            $isCloseFriend = false;
-        }
-
-        if ($user) {
-            $isFollowed = followsModel::where('follower_id', Auth::id())
-                ->where('followed_id', $user->id)
+        $Current = Auth::user();
+        $owner = $user;
+            $posts = PostModel::where('user_id', $user->id)->where('status','active')->with('comments')->orderBy('created_at', 'desc')->get();
+            $savedPosts  = postsSaveModel::where('user_id', $user->id)->with('post')->orderBy('created_at', 'desc')->get();
+            $postsCount = $posts->count();
+            $followersCount = $user->followers;
+            $followingCount = $user->following;
+            $isFollowed = false;
+            $followingIds = followsModel::where('follower_id', $user->id)
+                ->pluck('followed_id')
+                ->toArray();
+            $m[] = closeFriendModel::wherein('friend_id', $followingIds)
+                ->where('user_id', $user->id)
                 ->exists();
-        }
-        return [
-            'posts' => $posts,
-            'savedPosts' => $savedPosts,
-            'postsCount' => $postsCount,
-            'followersCount' => $followersCount,
-            'followingCount' => $followingCount,
-            'isFollowed' => $isFollowed,
-            'isCloseFriend' => $isCloseFriend,
-        ];
+            $m[] = Auth::id();
+
+            if (in_array($user->id, $m)) {
+                $isCloseFriend = true;
+            } else {
+                $isCloseFriend = false;
+            }
+
+            if ($user) {
+                $isFollowed = followsModel::where('follower_id', Auth::id())
+                    ->where('followed_id', $user->id)->where('status' , 'accepted')
+                    ->exists();
+            }
+            return [
+                'posts' => $posts,
+                'savedPosts' => $savedPosts,
+                'postsCount' => $postsCount,
+                'followersCount' => $followersCount,
+                'followingCount' => $followingCount,
+                'isFollowed' => $isFollowed,
+                'isCloseFriend' => $isCloseFriend,
+                'canViewProfile' => $this->CanViewProfile($Current, $owner),
+                'requested' => followsModel::where('follower_id', $Current->id)->where('status' , 'pending')->exists(),
+            ];
+
     }
     public function EditProfile($user , $data)
     {

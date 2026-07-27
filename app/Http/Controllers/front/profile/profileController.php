@@ -54,7 +54,6 @@ class profileController extends Controller
             return back()->with('fail', 'Something went wrong!');
         }
     }
-
     public function closeFriendShow()
     {
         $user = User::where('id', Auth::id())->first();
@@ -63,7 +62,6 @@ class profileController extends Controller
         $friendsCount = $friends->count();
         return view('index.closeFriend.closeFriend', compact('user','friends','followings','friendsCount'));
     }
-
     public function toggle()
     {
         $user = Auth::user();

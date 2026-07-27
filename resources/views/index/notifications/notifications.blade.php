@@ -37,7 +37,7 @@
                         @endif
                     </div>
                     <div class="notif-content">
-                        <div class="notif-text"><strong>{{$notification->user->username}}</strong> {{$notification->message}}</div>
+                        <div class="notif-text"><strong><a href="{{route('profile',$notification->user->username)}}" style="text-decoration: none; color: white">{{$notification->user->username}}</a></strong> {{$notification->message}}</div>
                         <div class="notif-time">{{$notification->created_at->diffForHumans()}}</div>
                     </div>
                     @if($notification->post)
@@ -57,12 +57,25 @@
                                      style="object-fit: cover; object-position: center; width: 100%; height: 100%;">
                             @endif
                         </a>
+
                     @elseif($notification->type == 'follow')
                         <button class="btn-edit custom-a {{ $notification->isFollowed ? 'following' : 'not-following' }}"
                                 data-username="{{ $notification->user->username }}"
                                 data-follow-url="{{ route('profile.user.follow', $notification->user->username) }}">
                             {{ $notification->isFollowed  ? 'Following' : 'Follow' }}
                         </button>
+                    @elseif($notification->type == 'request')
+                        @if(!$notification->isFollowed)
+                            <form method="POST" action="{{route('profile.user.follow.accept',$notification->user->id)}}">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" class="btn-edit accept-follow">
+                                    {{ $notification->isFollowed ? 'following' : 'Accept' }}
+                                </button>
+                            </form>
+                        @else
+                            <span class="btn-edit accept-follow">Following</span>
+                        @endif
                     @endif
                     <div class="unread-dot"></div>
                 </div>
