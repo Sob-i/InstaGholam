@@ -82,7 +82,7 @@
             @empty
                 <div class="notif-item">
                     <div class="notif-content">
-                        <div class="notif-text">No Notifications for today yet.</div>
+                        <div class="notif-text">No New Notifications for today.</div>
                     </div>
                 </div>
             @endforelse
@@ -154,7 +154,6 @@
                             <span class="btn-edit accept-follow">Following</span>
                         @endif
                     @endif
-                    <div class="unread-dot"></div>
                 </div>
             @empty
             @endforelse
