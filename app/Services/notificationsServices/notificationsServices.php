@@ -57,14 +57,30 @@ class notificationsServices
     public function NotificationData($user)
     {
         $notifications = notificationModel::where('target_user_id' , $user->id)->with(['user:id,username,avatar,email', 'targetUser' ,'post'])->orderBy('created_at', 'desc')->get();
+        $newNotifications = collect();
+        $oldNotifications = collect();
+
         foreach ($notifications as $notification) {
-            $notification->isFollowed = followsModel::where('follower_id' , $notification->target_user_id)->exists();
+
             if ($notification->type === 'follow') {
                 $notification->isFollowed = followsModel::where('follower_id', $user->id)
                     ->where('followed_id', $notification->user_id)
                     ->exists();
+            } else {
+                $notification->isFollowed = followsModel::where('follower_id', $notification->target_user_id)
+                    ->exists();
+            }
+
+            if ($notification->created_at->isToday()) {
+                $newNotifications->push($notification);
+            } else {
+                $oldNotifications->push($notification);
             }
         }
-        return $notifications;
+
+        return [
+            'newNotifications' => $newNotifications,
+            'oldNotifications' => $oldNotifications,
+        ];
     }
 }
