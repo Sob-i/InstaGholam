@@ -18,6 +18,8 @@ use App\Http\Controllers\admin\adminDashboardController;
 use App\Http\Controllers\admin\adminDashboard\usersDashboardController;
 use App\Http\Controllers\admin\adminDashboard\postsDashboardController;
 
+use App\Http\Controllers\front\report\reportController;
+
 
 
     // Login && SignUp Form
@@ -69,6 +71,9 @@ Route::middleware('auth')->group(function () {
         Route::put('profile/{id}/follow/acceptRequest', [followController::class, 'accept'])->name('profile.user.follow.accept');
         Route::get('profile/{username}/closeFriends', [profileController::class, 'closeFriendShow'])->name('profile.closeFriend.show');
         Route::post('profile/{username}/closeFriends', [profileController::class, 'toggle'])->name('profile.closeFriend.toggle');
+
+        // Report
+        Route::post('report/{Uid}', [reportController::class, 'Report'])->name('report.create');
 
     });
 

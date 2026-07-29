@@ -19,14 +19,27 @@
                             {{ $postWithInfo['isFollowed'] ? 'Following' : 'Follow' }}
                         </button>
                     @endif
-                    <div class="post-more">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
-                             viewBox="0 0 24 24">
-                            <circle cx="12" cy="5" r="1"/>
-                            <circle cx="12" cy="12" r="1"/>
-                            <circle cx="12" cy="19" r="1"/>
-                        </svg>
+                    <!-- Three-dot menu button -->
+                    <div class="dropdown-wrapper">
+                        <button class="btn-three-dot" onclick="toggleDropdown(event)">
+                            <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                <circle cx="12" cy="5" r="2"/>
+                                <circle cx="12" cy="12" r="2"/>
+                                <circle cx="12" cy="19" r="2"/>
+                            </svg>
+                        </button>
+
+                        <div class="dropdown-menu">
+                                  <span
+                                      class="dropdown-item report-btn"
+                                      data-post-id="{{ $post->id }}"
+                                      data-type="post"
+                                      data-uid="{{$post->user_id}}">
+                                        Report
+                                  </span>
+                        </div>
                     </div>
+
                 </div>
 
                 <!-- Image Slider -->

@@ -587,3 +587,70 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
     font-size: 12px;
 }
 
+/* Three-dot dropdown styles */
+.dropdown-wrapper {
+    display: inline-block;
+    position: relative;
+}
+
+.btn-three-dot {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    transition: background-color 0.2s ease;
+}
+
+.btn-three-dot:hover {
+    background-color: gray;
+}
+
+.btn-three-dot svg {
+    display: block;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    background: gray;
+    border: 1px solid black;
+    border-radius: 8px;
+    min-width: 180px;
+    z-index: 1000;
+    padding: 4px 0;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 10px 16px;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+    color: black;
+}
+
+.dropdown-item:first-child {
+    border-radius: 8px 8px 0 0;
+}
+
+.dropdown-item:last-child {
+    border-radius: 0 0 8px 8px;
+}

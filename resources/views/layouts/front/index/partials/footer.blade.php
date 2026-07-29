@@ -84,6 +84,34 @@
         }
     });
 </script>
+<script>
+    function toggleDropdown(event) {
+        event.stopPropagation();
+
+        const button = event.currentTarget;
+        const menu = button.nextElementSibling;
+
+        // close all other menus
+        document.querySelectorAll('.dropdown-menu').forEach(item => {
+            if (item !== menu) {
+                item.classList.remove('show');
+            }
+        });
+
+        // toggle current menu
+        menu.classList.toggle('show');
+    }
+
+    document.addEventListener('click', function(event) {
+        document.querySelectorAll('.dropdown-wrapper').forEach(wrapper => {
+            const dropdown = wrapper.querySelector('.dropdown-menu');
+
+            if (!wrapper.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+    });
+</script>
 <script src="{{asset('frontJs/profile/follow.js')}}"></script>
 <script src="{{asset('frontJs/postSingle/video.js')}}"></script>
 <script src="{{asset('frontJs/postSingle/comment.js')}}"></script>
