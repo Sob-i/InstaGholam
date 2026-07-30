@@ -21,6 +21,7 @@ class reportController extends Controller
         $data = [
             'reporterUid' => Auth::user()->id,
             'reportedUid' => $uid,
+            'reportableId' => $request->get('id'),
             'reportableType' => $request->get('type'),
             'reportSubject' => $request->get('report-subject'),
         ];

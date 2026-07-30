@@ -32,7 +32,7 @@
                         <div class="dropdown-menu">
                                   <span
                                       class="dropdown-item report-btn"
-                                      data-post-id="{{ $post->id }}"
+                                      data-id="{{ $post->id }}"
                                       data-type="post"
                                       data-uid="{{$post->user_id}}">
                                         Report
@@ -40,6 +40,68 @@
                         </div>
                     </div>
 
+                </div>
+
+                <!-- Report Modal -->
+                <div id="reportModal" class="report-modal">
+                    <div class="report-modal-content">
+                        <div class="report-modal-header">
+                            <h3>Report</h3>
+                            <button type="button" id="closeReportModal">&times;</button>
+                        </div>
+
+                        <form id="reportForm">
+                            @csrf
+
+                            <input type="hidden" id="reported-user-id" name="id">
+                            <input type="hidden" id="report-type" name="type">
+                            <input type="hidden" id="reporter-uid">
+
+                            <div class="report-options">
+
+                                <label>
+                                    <input type="radio" name="report-subject" value="spam" required>
+                                    Spam
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="report-subject" value="harassment">
+                                    Harassment or Bullying
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="report-subject" value="hate_speech">
+                                    Hate Speech
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="report-subject" value="violence">
+                                    Violence or Dangerous Content
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="report-subject" value="nudity">
+                                    Nudity or Sexual Content
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="report-subject" value="false_information">
+                                    False Information
+                                </label>
+
+                                <label>
+                                    <input type="radio" name="report-subject" value="other">
+                                    Other
+                                </label>
+
+                            </div>
+
+                            <div class="report-buttons">
+                                <button type="button" id="cancelReport">Cancel</button>
+                                <button type="submit">Submit</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Image Slider -->

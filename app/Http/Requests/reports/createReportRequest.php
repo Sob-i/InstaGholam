@@ -23,12 +23,9 @@ class createReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reporter_id' => 'required|integer',
-            'reported_user_id' => 'required|integer',
-            'reported_post_id' => 'nullable|integer',
-            'reported_comment_id' => 'nullable|integer',
-            'reported_story_id' => 'nullable|integer',
-            'report_subject'=> 'required|in:spam,harassment,hate_speech,violence,nudity,false_information,other',
+            'id' => 'required|integer',
+            'type' => 'required',
+            'report-subject'=> 'required|in:spam,harassment,hate_speech,violence,nudity,false_information,other',
         ];
     }
 }

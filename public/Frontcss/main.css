@@ -654,3 +654,58 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
 .dropdown-item:last-child {
     border-radius: 0 0 8px 8px;
 }
+
+
+.report-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.6);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.report-modal-content{
+    width:400px;
+    max-width:95%;
+    background:#202020;
+    color:#fff;
+    border-radius:12px;
+    padding:20px;
+}
+
+.report-modal-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.report-modal-header button{
+    background:none;
+    border:none;
+    color:white;
+    font-size:24px;
+    cursor:pointer;
+}
+
+.report-options label{
+    display:block;
+    margin:12px 0;
+    cursor:pointer;
+}
+
+.report-buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:20px;
+}
+
+.report-buttons button{
+    padding:8px 18px;
+    border:none;
+    cursor:pointer;
+    border-radius:6px;
+}
