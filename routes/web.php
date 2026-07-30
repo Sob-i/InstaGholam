@@ -101,6 +101,9 @@ Route::middleware('auth')->group(function () {
         Route::put('posts/statusToFlagged/{id}', [postsDashboardController::class, 'postStatusToFlagged'])->name('admin.posts.status.to.flagged');
         Route::put('posts/statusToHidden/{id}', [postsDashboardController::class, 'postStatusToHidden'])->name('admin.posts.status.to.hidden');
 
+        // Reports
+        Route::get('reports', [adminDashboardController::class, 'showReports'])->name('admin.reports');
+
     });
 
 });

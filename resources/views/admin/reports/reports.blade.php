@@ -21,90 +21,58 @@
                     </div>
                 </div>
                 <div class="report-items">
-                    <div class="report-item active-item">
-                        <div class="ri-thumb t1"></div>
-                        <div class="ri-info">
-                            <div class="ri-reason">Inappropriate content</div>
-                            <div class="ri-target">Post by @nxt.studio</div>
-                            <div class="ri-meta">
-                                <span class="ri-count">⚑ 8 reports</span>
-                                <span class="ri-time">2h ago</span>
-                                <span class="ri-priority pri-high">HIGH</span>
+                    @forelse($data['reports'] as $report)
+                        @php
+                            if (!empty($report->reportable->post_files)){
+                                $firstFile = strtok($report->reportable->post_files, ',');
+                                $fileExtension = strtolower(pathinfo($firstFile, PATHINFO_EXTENSION));
+                                $isVideo = in_array($fileExtension, ['mp4', 'mov', 'avi', 'webm']);
+                                $postPath = 'users/posts/' . strstr($report->reportedUser->email, '@', true) . '-posts/' . $report->reportable->created_at->format('Y-m-d') . '/' . $firstFile;
+                            }
+                        @endphp
+                        <div class="report-item"  data-report-id="{{ $report->id }}"
+                             data-count="{{ $count['count'] ?? 1 }}"
+                             data-username="{{ $report->reportedUser->username }}"
+                             data-posted="{{ $report->reportable->created_at->format('M d, Y h:i A') }}"
+                             data-caption="{{ $report->reportable->post_caption }}"
+                             data-reason="{{ $report->subject_label }}"
+                             data-image="{{ asset($postPath) }}"
+                             data-is-video="{{ $isVideo ? 1 : 0 }}">
+                            @if($report->reportable)
+                                <a href="{{route('post.show',$report->reportable->id)}}" class="ri-thumb t1">
+                                    @if($isVideo)
+                                        <video style="object-fit: cover; object-position: center; width: 100%; height: 100%; pointer-events: none;"
+                                               muted
+                                               preload="metadata"
+                                               disablepictureinpicture
+                                               disableremoteplayback>
+                                            <source src="{{ asset($postPath) }}" type="video/{{ $fileExtension }}">
+                                        </video>
+                                    @else
+                                        <img src="{{ asset($postPath) }}"
+                                             alt="Post image"
+                                             loading="lazy"
+                                             style="object-fit: cover; object-position: center; width: 100%; height: 100%;">
+                                    @endif
+                                </a>
+                            @endif
+                            <div class="ri-info">
+                                <div class="ri-reason">{{$report->subject_label}}</div>
+                                <div class="ri-target">Post by {{'@'.$report->reportedUser->username}}</div>
+                                <div>
+                                    @forelse($data['reportsCount'] as $count)
+                                        @if($report->reportable->id == $count['item']['id'] )
+                                            <span class="ri-count">⚑ {{$count['count']}} reports</span>
+                                        @endif
+                                    @empty
+                                    @endforelse
+                                    <span class="ri-time">{{$report->created_at->diffForHumans()}}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="report-item">
-                        <div class="ri-thumb t2"></div>
-                        <div class="ri-info">
-                            <div class="ri-reason">Spam / misleading</div>
-                            <div class="ri-target">Reel by @user_4421</div>
-                            <div class="ri-meta">
-                                <span class="ri-count">⚑ 5 reports</span>
-                                <span class="ri-time">4h ago</span>
-                                <span class="ri-priority pri-high">HIGH</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="report-item">
-                        <div class="ri-thumb text-type">💬</div>
-                        <div class="ri-info">
-                            <div class="ri-reason">Hate speech</div>
-                            <div class="ri-target">Comment by @anon_88x</div>
-                            <div class="ri-meta">
-                                <span class="ri-count">⚑ 4 reports</span>
-                                <span class="ri-time">5h ago</span>
-                                <span class="ri-priority pri-high">HIGH</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="report-item">
-                        <div class="ri-thumb t3"></div>
-                        <div class="ri-info">
-                            <div class="ri-reason">Impersonation</div>
-                            <div class="ri-target">Profile @alex_rivera2</div>
-                            <div class="ri-meta">
-                                <span class="ri-count">⚑ 3 reports</span>
-                                <span class="ri-time">8h ago</span>
-                                <span class="ri-priority pri-med">MED</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="report-item">
-                        <div class="ri-thumb t4"></div>
-                        <div class="ri-info">
-                            <div class="ri-reason">Copyright infringement</div>
-                            <div class="ri-target">Photo by @drone.life</div>
-                            <div class="ri-meta">
-                                <span class="ri-count">⚑ 2 reports</span>
-                                <span class="ri-time">12h ago</span>
-                                <span class="ri-priority pri-med">MED</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="report-item">
-                        <div class="ri-thumb text-type">💬</div>
-                        <div class="ri-info">
-                            <div class="ri-reason">Harassment / bullying</div>
-                            <div class="ri-target">Comment by @user_9912</div>
-                            <div class="ri-meta">
-                                <span class="ri-count">⚑ 1 report</span>
-                                <span class="ri-time">1d ago</span>
-                                <span class="ri-priority pri-low">LOW</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="report-item">
-                        <div class="ri-thumb t5"></div>
-                        <div class="ri-info">
-                            <div class="ri-reason">Self-harm content</div>
-                            <div class="ri-target">Story by @user_3318</div>
-                            <div class="ri-meta">
-                                <span class="ri-count">⚑ 1 report</span>
-                                <span class="ri-time">1d ago</span>
-                                <span class="ri-priority pri-low">LOW</span>
-                            </div>
-                        </div>
-                    </div>
+                    @empty
+
+                    @endforelse
                 </div>
             </div>
 
@@ -113,30 +81,26 @@
                 <!-- Report Detail -->
                 <div class="detail-card">
                     <div class="detail-head">
-                        <span class="detail-title">Report #1094 — Inappropriate content</span>
-                        <span class="detail-badge">8 reports · HIGH</span>
+                        <div class="detail-title" id="detailTitle"></div>
+                        <span class="detail-badge" id="detailBadge"></span>
                     </div>
                     <div class="detail-body">
-                        <div class="content-preview"></div>
-                        <div class="detail-row">
-                            <span class="detail-label">Content type</span>
-                            <span class="detail-val">Photo post</span>
-                        </div>
+                        <div class="content-preview" id="detailPreview"></div>
                         <div class="detail-row">
                             <span class="detail-label">Posted by</span>
-                            <span class="detail-val"><strong>@nxt.studio</strong> · <a href="admin-users.html">View profile</a></span>
+                            <span class="detail-val" id="detailUser"></span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">Posted at</span>
-                            <span class="detail-val">Jun 16, 2025 at 09:41 AM</span>
+                            <span class="detail-val" id="detailPosted"></span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">Caption</span>
-                            <span class="detail-val">"🔥🔥🔥 #viral #trending"</span>
+                            <span class="detail-val" id="detailCaption"></span>
                         </div>
                         <div class="detail-row">
                             <span class="detail-label">Report reasons</span>
-                            <span class="detail-val">Nudity or sexual content (5), Violence or graphic content (3)</span>
+                            <span class="detail-val" id="detailReasons"></span>
                         </div>
                         <div style="margin-top:16px;">
                             <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Reporters</div>
@@ -177,4 +141,127 @@
         </div>
     </div>
 
+    <script>
+        function loadReport(item) {
+
+            document.querySelectorAll(".report-item").forEach(report => {
+                report.classList.remove("selected");
+            });
+
+            item.classList.add("selected");
+
+            document.getElementById("detailTitle").textContent =
+                `Report #${item.dataset.reportId}`;
+
+            document.getElementById("detailBadge").textContent =
+                `${item.dataset.count} reports`;
+
+            document.getElementById("detailUser").innerHTML =
+                `<strong>@${item.dataset.username}</strong>`;
+
+            document.getElementById("detailPosted").textContent =
+                item.dataset.posted;
+
+            document.getElementById("detailCaption").textContent =
+                item.dataset.caption;
+
+            document.getElementById("detailReasons").textContent =
+                item.dataset.reason;
+
+            const preview = document.getElementById("detailPreview");
+
+            if (item.dataset.isVideo === "1") {
+
+                preview.innerHTML = `
+            <div class="preview-video-wrapper">
+                <video
+                    id="detailVideo"
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    disablepictureinpicture
+                    controlsList="nodownload nofullscreen noplaybackrate"
+                >
+                    <source src="${item.dataset.image}">
+                </video>
+
+                <button
+                    id="muteToggle"
+                    class="mute-btn">
+                    🔇
+                </button>
+            </div>
+        `;
+
+                const video = document.getElementById("detailVideo");
+                const muteBtn = document.getElementById("muteToggle");
+
+                muteBtn.onclick = function () {
+
+                    video.muted = !video.muted;
+
+                    muteBtn.textContent = video.muted ? "🔇" : "🔊";
+
+                };
+
+            } else {
+
+                preview.innerHTML = `
+            <img
+                src="${item.dataset.image}"
+                style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+        `;
+
+            }
+
+        }
+        document.addEventListener("click", function (e) {
+
+            const item = e.target.closest(".report-item");
+
+            if (!item) return;
+
+            loadReport(item);
+
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const first = document.querySelector(".report-item");
+
+            if (first) {
+                loadReport(first);
+            }
+
+        });
+        function renderReporters(reporters) {
+
+            const list = document.getElementById("reportersList");
+
+            list.innerHTML = "";
+
+            reporters.forEach(report => {
+
+                list.innerHTML += `
+            <div class="reporter-row">
+                <div class="rep-av"></div>
+
+                <span class="rep-name">
+                    @${report.username}
+                </span>
+
+                <span class="rep-reason">
+                    ${report.reason}
+                </span>
+
+                <span class="rep-time">
+                    ${report.time}
+                </span>
+            </div>
+        `;
+
+            });
+
+        }
+    </script>
 @endsection

@@ -4,11 +4,17 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\posts\postModel;
+use App\Models\reports\reportModel;
 use App\Models\User;
+use App\Services\reportServices\reportServices;
 use Illuminate\Http\Request;
 
 class adminDashboardController extends Controller
 {
+    public function __construct(protected reportServices $reportServices)
+    {
+
+    }
     public function showDashboard()
     {
         $user = auth()->user();
@@ -18,9 +24,9 @@ class adminDashboardController extends Controller
             now()->startOfYear(),
             now()->endOfYear()
         ])->take(5)->get();
-        return view('admin.dashboard.dashboard', compact('user', 'TotalUsers', 'todayPosts', 'recentUsers'));
+        $openReportsCount = reportModel::where('status', 'pending')->count();
+        return view('admin.dashboard.dashboard', compact('user', 'TotalUsers', 'todayPosts', 'recentUsers', 'openReportsCount'));
     }
-
     public function showUsers()
     {
         $users = User::orderby('created_at', 'desc')->paginate(10);
@@ -36,7 +42,6 @@ class adminDashboardController extends Controller
         })->count();
         return view('admin.users.users', compact('users', 'totalUsers', 'activeUser', 'suspendedUsers', 'bannedUsers'));
     }
-
     public function showPosts(){
         $posts = postModel::take(24)->latest()->with('user')->get();
         $postsCount = $this->numberFormat($posts->count());
@@ -86,5 +91,10 @@ class adminDashboardController extends Controller
             return round($number / 1000, 1) . 'k';
         }
         return $number;
+    }
+    public function showReports()
+    {
+        $data = $this->reportServices->ReportsData();
+        return view('admin.reports.reports', compact('data'));
     }
 }

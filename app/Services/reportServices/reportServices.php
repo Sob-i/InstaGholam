@@ -3,12 +3,7 @@
 namespace App\Services\reportServices;
 
 
-use App\Models\posts\postsSaveModel;
 use App\Models\reports\reportModel;
-use App\Models\User;
-use App\Models\user\followsModel;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 
 class reportServices
 {
@@ -65,6 +60,21 @@ class reportServices
             'status' => false,
             'message' => 'Something went wrong.'
         ]);
+    }
+
+    public function ReportsData()
+    {
+        $reports = reportModel::where('status', 'pending')->orderBy('created_at', 'desc')->with(['reportable','reportedUser:id,username,email','reporter:id,username,email'])->get();
+        $reportsCount = $reports->groupBy('reportable_id')->map(function ($group) {
+                return [
+                    'item' => $group->first()->reportable,
+                    'count' => $group->count(),
+                ];
+            });
+        return [
+            'reports' => $reports,
+            'reportsCount' => $reportsCount
+        ];
     }
 
 }

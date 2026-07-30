@@ -2,6 +2,7 @@
 
 namespace App\Models\posts;
 
+use App\Models\reports\reportModel;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\comments\commentModel;
@@ -27,18 +28,14 @@ class postModel extends Model
     public function user(){
         return $this->belongsTo(User::class , 'user_id');
     }
-
-
     public function comments()
     {
         return $this->hasMany(commentModel::class, 'post_id', 'id');
     }
-
     public function likes()
     {
         return $this->hasMany(postsLikeModel::class, 'post_id');
     }
-
     public function isLikedByUser($userId = null)
     {
         if (!$userId && auth()->check()) {
@@ -49,12 +46,10 @@ class postModel extends Model
 
         return $this->likes()->where('user_id', $userId)->exists();
     }
-
     public function saves()
     {
         return $this->hasMany(postsSaveModel::class , 'post_id');
     }
-
     public function isSavedByUser($userId = null)
     {
         if (!$userId && auth()->check()) {
