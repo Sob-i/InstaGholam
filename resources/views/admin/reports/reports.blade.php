@@ -203,8 +203,22 @@
                 const reportableId = report.reportable.id;
                 const reportableType = report.reportable_type;
 
+                let type = "user";
+
+                if (report.reportable_type.includes("postModel")) {
+                    type = "post";
+                } else if (report.reportable_type.includes("commentModel")) {
+                    type = "comment";
+                } else if (report.reportable_type.includes("storyModel")) {
+                    type = "story";
+                } else if (report.reportable_type.includes("User")) {
+                    type = "user";
+                }
+
                 const reportHtml = `
-            <div class="report-item" data-report-id="${report.id}"
+            <div class="report-item"
+                data-type="${type}"
+                data-report-id="${report.id}"
                  data-count="${count}"
                  data-username="${username}"
                  data-posted="${postedDate}"
@@ -261,6 +275,42 @@
         }
 
         renderReports(data);
+
+        document.addEventListener("click", function(e) {
+
+            const tab = e.target.closest(".ftab");
+
+            if (!tab) return;
+
+            document.querySelectorAll(".ftab").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            tab.classList.add("active");
+
+
+            const filter = tab.textContent.trim().toLowerCase();
+
+            document.querySelectorAll(".report-item").forEach(item => {
+
+                const type = item.dataset.type;
+
+                if (filter === "all") {
+                    item.style.display = "";
+                }
+                else if (type === filter.slice(0, -1)) {
+                    // posts -> post
+                    // users -> user
+                    // comments -> comment
+                    item.style.display = "";
+                }
+                else {
+                    item.style.display = "none";
+                }
+
+            });
+
+        });
     </script>
     <script>
         function loadReport(item) {
