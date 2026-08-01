@@ -441,7 +441,7 @@
                 reportersList.innerHTML += `
             <div class="reporter-row">
                 <div class="rep-av"></div>
-                <img src="/users/avatar/${report.reporter.avatar}" class="sidebar-avatar" style="margin-left: -6%;">
+                <img src="/users/avatar/${report.reporter.avatar}" class="sidebar-avatar" style="margin-left: -4%;">
                 <span class="rep-name">${report.reporter.username}</span>
                 <span class="rep-reason">${report.report_subject}</span>
                 <span class="rep-time">${time}</span>
