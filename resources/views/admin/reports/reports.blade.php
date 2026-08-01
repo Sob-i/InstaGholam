@@ -1,3 +1,4 @@
+
 @extends('layouts.admin.reports.main')
 @section('content')
 
@@ -20,59 +21,8 @@
                         <button class="ftab">Comments</button>
                     </div>
                 </div>
-                <div class="report-items">
-                    @forelse($data['reports'] as $report)
-                        @php
-                            if (!empty($report->reportable->post_files)){
-                                $firstFile = strtok($report->reportable->post_files, ',');
-                                $fileExtension = strtolower(pathinfo($firstFile, PATHINFO_EXTENSION));
-                                $isVideo = in_array($fileExtension, ['mp4', 'mov', 'avi', 'webm']);
-                                $postPath = 'users/posts/' . strstr($report->reportedUser->email, '@', true) . '-posts/' . $report->reportable->created_at->format('Y-m-d') . '/' . $firstFile;
-                            }
-                        @endphp
-                        <div class="report-item"  data-report-id="{{ $report->id }}"
-                             data-count="{{ $count['count'] ?? 1 }}"
-                             data-username="{{ $report->reportedUser->username }}"
-                             data-posted="{{ $report->reportable->created_at->format('M d, Y h:i A') }}"
-                             data-caption="{{ $report->reportable->post_caption }}"
-                             data-reason="{{ $report->subject_label }}"
-                             data-image="{{ asset($postPath) }}"
-                             data-is-video="{{ $isVideo ? 1 : 0 }}">
-                            @if($report->reportable)
-                                <a href="{{route('post.show',$report->reportable->id)}}" class="ri-thumb t1">
-                                    @if($isVideo)
-                                        <video style="object-fit: cover; object-position: center; width: 100%; height: 100%; pointer-events: none;"
-                                               muted
-                                               preload="metadata"
-                                               disablepictureinpicture
-                                               disableremoteplayback>
-                                            <source src="{{ asset($postPath) }}" type="video/{{ $fileExtension }}">
-                                        </video>
-                                    @else
-                                        <img src="{{ asset($postPath) }}"
-                                             alt="Post image"
-                                             loading="lazy"
-                                             style="object-fit: cover; object-position: center; width: 100%; height: 100%;">
-                                    @endif
-                                </a>
-                            @endif
-                            <div class="ri-info">
-                                <div class="ri-reason">{{$report->subject_label}}</div>
-                                <div class="ri-target">Post by {{'@'.$report->reportedUser->username}}</div>
-                                <div>
-                                    @forelse($data['reportsCount'] as $count)
-                                        @if($report->reportable->id == $count['item']['id'] )
-                                            <span class="ri-count">⚑ {{$count['count']}} reports</span>
-                                        @endif
-                                    @empty
-                                    @endforelse
-                                    <span class="ri-time">{{$report->created_at->diffForHumans()}}</span>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-
-                    @endforelse
+                <div class="reports-container">
+                    <!-- Reports will be rendered here by JavaScript -->
                 </div>
             </div>
 
@@ -104,11 +54,8 @@
                         </div>
                         <div style="margin-top:16px;">
                             <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Reporters</div>
-                            <div class="reporters-list">
-                                <div class="reporter-row"><div class="rep-av ra"></div><span class="rep-name">maya_k</span><span class="rep-reason">Nudity or sexual content</span><span class="rep-time">2h ago</span></div>
-                                <div class="reporter-row"><div class="rep-av rb"></div><span class="rep-name">sunseeker</span><span class="rep-reason">Nudity or sexual content</span><span class="rep-time">2h ago</span></div>
-                                <div class="reporter-row"><div class="rep-av rc"></div><span class="rep-name">lena_arts</span><span class="rep-reason">Violence or graphic content</span><span class="rep-time">3h ago</span></div>
-                                <div style="font-size:12px;color:var(--muted);margin-top:4px;">+ 5 more reporters</div>
+                            <div class="reporters-list" id="reportersList"></div>
+
                             </div>
                         </div>
                     </div>
@@ -142,6 +89,180 @@
     </div>
 
     <script>
+        const data = @json([
+        'reports' => $data['reports'],
+        'reportsCount' => $data['reportsCount']
+    ]);
+    </script>
+    <script>
+        function renderReports(data) {
+            const container = document.querySelector('.reports-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            // Convert reportsCount to array if it's an object
+            let reportsCountArray = [];
+            if (data.reportsCount) {
+                if (typeof data.reportsCount === 'object' && !Array.isArray(data.reportsCount)) {
+                    reportsCountArray = Object.values(data.reportsCount);
+                } else if (Array.isArray(data.reportsCount)) {
+                    reportsCountArray = data.reportsCount;
+                }
+            }
+
+            // Track rendered reportable IDs to prevent duplicates
+            const renderedReportableIds = new Set();
+
+            data.reports.forEach((report) => {
+                if (!report.reportable || renderedReportableIds.has(report.reportable.id)) {
+                    return;
+                }
+                renderedReportableIds.add(report.reportable.id);
+
+                let postPath = '';
+                let fileExtension = 'jpg';
+                let isVideo = false;
+
+                if (report.reportable.post_files) {
+                    const firstFile = report.reportable.post_files.split(',')[0].trim();
+                    fileExtension = firstFile.split('.').pop().toLowerCase();
+                    isVideo = ['mp4', 'mov', 'avi', 'webm', 'mkv', 'ogg'].includes(fileExtension);
+
+                    const email = report.reportedUser ? report.reportedUser.email :
+                        (report.reported_user ? report.reported_user.email : '');
+                    const username = email.split('@')[0];
+
+                    // Get timestamp from filename
+                    const timestamp = firstFile.replace(`${username}-`, '').replace(`.${fileExtension}`, '');
+
+                    let postDate;
+                    if (!isNaN(timestamp)) {
+                        const ts = parseInt(timestamp);
+                        let seconds;
+
+                        if (timestamp.length === 13) {
+                            seconds = Math.floor(ts / 1000);
+                        } else if (timestamp.length === 12) {
+                            seconds = Math.floor(ts / 1000);
+                        } else if (timestamp.length === 10) {
+                            seconds = ts;
+                        } else {
+                            seconds = Math.floor(ts / 1000);
+                        }
+
+                        postDate = new Date(seconds * 1000);
+
+                        if (isNaN(postDate.getTime()) || postDate.getFullYear() < 2020) {
+                            postDate = new Date(report.reportable.created_at);
+                        }
+                    } else {
+                        postDate = new Date(report.reportable.created_at);
+                    }
+
+                    if (!postDate || isNaN(postDate.getTime())) {
+                        postDate = new Date();
+                    }
+
+                    // Use UTC to avoid timezone issues
+                    const year = postDate.getUTCFullYear();
+                    const month = String(postDate.getUTCMonth() + 1).padStart(2, '0');
+                    const day = String(postDate.getUTCDate()).padStart(2, '0');
+                    const formattedDate = `${year}-${month}-${day}`;
+
+                    postPath = `/users/posts/${username}-posts/${formattedDate}/${firstFile}`;
+                }
+
+                // Get count
+                let count = 1;
+                reportsCountArray.forEach((countItem) => {
+                    if (countItem.item && countItem.item.id === report.reportable.id) {
+                        count = countItem.count;
+                    }
+                });
+
+                // Format posted date
+                let postedDate = '';
+                if (report.reportable.created_at) {
+                    const date = new Date(report.reportable.created_at);
+                    if (!isNaN(date.getTime())) {
+                        postedDate = date.toLocaleString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    }
+                }
+
+                const username = report.reportedUser ? report.reportedUser.username :
+                    (report.reported_user ? report.reported_user.username : '');
+                const subjectLabel = report.subject_label || report.report_subject || 'No reason provided';
+                const caption = report.reportable.post_caption || '';
+                const reportableId = report.reportable.id;
+                const reportableType = report.reportable_type;
+
+                const reportHtml = `
+            <div class="report-item" data-report-id="${report.id}"
+                 data-count="${count}"
+                 data-username="${username}"
+                 data-posted="${postedDate}"
+                 data-caption="${caption}"
+                 data-reason="${subjectLabel}"
+                 data-image="${postPath}"
+                 data-is-video="${isVideo ? 1 : 0}"
+                data-reportable-id="${reportableId}"
+                data-reportable-type="${reportableType}">
+                ${report.reportable ? `
+                    <a href="/post/${report.reportable.id}" class="ri-thumb t1">
+                        ${isVideo ? `
+                            <video style="object-fit: cover; object-position: center; width: 100%; height: 100%; pointer-events: none;"
+                                   muted
+                                   preload="metadata"
+                                   playsinline
+                                   disablepictureinpicture
+                                   disableremoteplayback
+                                   onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;background:#f0f0f0;color:#999;font-size:14px;\\'>Video unavailable</div>'">
+                                <source src="${postPath}" type="video/${fileExtension}">
+                            </video>
+                        ` : `
+                            <img src="${postPath}"
+                                 alt="Post image"
+                                 loading="lazy"
+                                 style="object-fit: cover; object-position: center; width: 100%; height: 100%;"
+                                 onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;background:#f0f0f0;color:#999;font-size:14px;\\'>Image unavailable</div>'">
+                        `}
+                    </a>
+                ` : ''}
+                <div class="ri-info">
+                    <div class="ri-reason">${subjectLabel}</div>
+                    <div class="ri-target">Post by ${username ? '@' + username : ''}</div>
+                    <div>
+                        <span class="ri-count">⚑ ${count} report${count > 1 ? 's' : ''}</span>
+                        <span class="ri-time">${report.created_at ? timeAgo(new Date(report.created_at)) : ''}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+                container.innerHTML += reportHtml;
+            });
+        }
+
+        function timeAgo(date) {
+            const diff = Math.floor((new Date() - date) / 1000);
+            if (diff < 60) return diff + ' seconds ago';
+            if (diff < 3600) return Math.floor(diff / 60) + ' minutes ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
+            if (diff < 2592000) return Math.floor(diff / 86400) + ' days ago';
+            if (diff < 31536000) return Math.floor(diff / 2592000) + ' months ago';
+            return Math.floor(diff / 31536000) + ' years ago';
+        }
+
+        renderReports(data);
+    </script>
+    <script>
         function loadReport(item) {
 
             document.querySelectorAll(".report-item").forEach(report => {
@@ -157,7 +278,7 @@
                 `${item.dataset.count} reports`;
 
             document.getElementById("detailUser").innerHTML =
-                `<strong>@${item.dataset.username}</strong>`;
+                `<a href="/profile/${item.dataset.username}">@${item.dataset.username}</a>`;
 
             document.getElementById("detailPosted").textContent =
                 item.dataset.posted;
@@ -165,9 +286,26 @@
             document.getElementById("detailCaption").textContent =
                 item.dataset.caption;
 
-            document.getElementById("detailReasons").textContent =
-                item.dataset.reason;
+            const reports = data.reports.filter(report =>
+                report.reportable_id == item.dataset.reportableId &&
+                report.reportable_type == item.dataset.reportableType
+            );
 
+            const labels = {
+                spam: "Spam",
+                harassment: "Harassment",
+                hate_speech: "Hate Speech",
+                violence: "Violence",
+                nudity: "Nudity",
+                false_information: "False Information",
+                other: "Other"
+            };
+
+            const reasons = [...new Set(
+                reports.map(r => labels[r.report_subject] || r.report_subject)
+            )].join(", ");
+
+            document.getElementById("detailReasons").textContent = reasons;
             const preview = document.getElementById("detailPreview");
 
             if (item.dataset.isVideo === "1") {
@@ -234,34 +372,51 @@
             }
 
         });
-        function renderReporters(reporters) {
+        function loadReporters(item) {
 
-            const list = document.getElementById("reportersList");
+            const reportersList = document.getElementById("reportersList");
 
-            list.innerHTML = "";
+            reportersList.innerHTML = "";
 
-            reporters.forEach(report => {
+            const reportId = Number(item.dataset.reportId);
 
-                list.innerHTML += `
+            const reports = data.reports.filter(report =>
+                report.reportable_id == item.dataset.reportableId &&
+                report.reportable_type == item.dataset.reportableType
+            );
+
+
+            reports.forEach(report => {
+                const time = new Date(report.created_at).toLocaleString();
+                reportersList.innerHTML += `
             <div class="reporter-row">
                 <div class="rep-av"></div>
-
-                <span class="rep-name">
-                    @${report.username}
-                </span>
-
-                <span class="rep-reason">
-                    ${report.reason}
-                </span>
-
-                <span class="rep-time">
-                    ${report.time}
-                </span>
+                <img src="/users/avatar/${report.reporter.avatar}" class="sidebar-avatar" style="margin-left: -6%;">
+                <span class="rep-name">${report.reporter.username}</span>
+                <span class="rep-reason">${report.report_subject}</span>
+                <span class="rep-time">${time}</span>
             </div>
         `;
 
             });
 
         }
+        document.addEventListener("click", function (e) {
+
+            const item = e.target.closest(".report-item");
+
+            if (!item) return;
+
+            loadReporters(item);
+
+        });document.addEventListener("DOMContentLoaded", function () {
+
+            const first = document.querySelector(".report-item");
+
+            if (first) {
+                loadReporters(first);
+            }
+
+        });
     </script>
 @endsection

@@ -64,7 +64,7 @@ class reportServices
 
     public function ReportsData()
     {
-        $reports = reportModel::where('status', 'pending')->orderBy('created_at', 'desc')->with(['reportable','reportedUser:id,username,email','reporter:id,username,email'])->get();
+        $reports = reportModel::where('status', 'pending')->orderBy('created_at', 'desc')->with(['reportable','reportedUser:id,username,email','reporter:id,username,email,avatar'])->get();
         $reportsCount = $reports->groupBy('reportable_id')->map(function ($group) {
                 return [
                     'item' => $group->first()->reportable,
