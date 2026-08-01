@@ -5,7 +5,7 @@
     <div class="main">
         <div class="topbar">
             <span class="topbar-title">Reports</span>
-            <span class="urgent-badge">14 open · 3 urgent</span>
+            <span class="urgent-badge">{{$data['reportsCount']->count()}} open</span>
             <div class="spacer"></div>
         </div>
 
