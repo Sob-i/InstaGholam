@@ -331,7 +331,27 @@
                                                     <span class="comment-text">{{ $comment->content }}</span>
                                                     <span class="post-time" style="color: #8e8e8e; font-size: 10px; margin-right: 8px; direction: ltr; display: inline-block;">{{ $comment->created_at->diffForHumans() }}</span>
                                                 </div>
+                                                <!-- Three-dot menu button -->
+                                                <div class="dropdown-wrapper">
+                                                    <button class="btn-three-dot" onclick="toggleDropdown(event)">
+                                                        <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                                            <circle cx="12" cy="5" r="2"/>
+                                                            <circle cx="12" cy="12" r="2"/>
+                                                            <circle cx="12" cy="19" r="2"/>
+                                                        </svg>
+                                                    </button>
+
+                                                <div class="dropdown-menu">
+                                                  <span
+                                                      class="dropdown-item report-btn"
+                                                      data-id="{{ $comment->id }}"
+                                                      data-type="comment"
+                                                      data-uid="{{$comment->user_id}}">
+                                                        Report
+                                                  </span>
+                                                </div>
                                             </div>
+                                        </div>
                                         @endforeach
                                     @else
                                         <div class="no-comments" id="no-comments-{{ $post->id }}" style="color: #8e8e8e; font-size: 14px; padding: 10px 0;">

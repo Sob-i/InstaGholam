@@ -199,7 +199,7 @@
                 const username = report.reportedUser ? report.reportedUser.username :
                     (report.reported_user ? report.reported_user.username : '');
                 const subjectLabel = report.subject_label || report.report_subject || 'No reason provided';
-                const caption = report.reportable.post_caption || '';
+                const caption = report.reportable_type.includes("commentModel") ? (report.reportable.content || '') : (report.reportable.post_caption || '');
                 const reportableId = report.reportable.id;
                 const reportableType = report.reportable_type;
 
@@ -229,26 +229,32 @@
                 data-reportable-id="${reportableId}"
                 data-reportable-type="${reportableType}">
                 ${report.reportable ? `
-                    <a href="/post/${report.reportable.id}" class="ri-thumb t1">
-                        ${isVideo ? `
-                            <video style="object-fit: cover; object-position: center; width: 100%; height: 100%; pointer-events: none;"
-                                   muted
-                                   preload="metadata"
-                                   playsinline
-                                   disablepictureinpicture
-                                   disableremoteplayback
-                                   onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;background:#f0f0f0;color:#999;font-size:14px;\\'>Video unavailable</div>'">
-                                <source src="${postPath}" type="video/${fileExtension}">
-                            </video>
-                        ` : `
-                            <img src="${postPath}"
-                                 alt="Post image"
-                                 loading="lazy"
-                                 style="object-fit: cover; object-position: center; width: 100%; height: 100%;"
-                                 onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;height:100%;background:#f0f0f0;color:#999;font-size:14px;\\'>Image unavailable</div>'">
-                        `}
-                    </a>
-                ` : ''}
+   ${type === "comment" ? `
+    <div class="ri-thumb t1">
+        <div style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;">
+           <i class="fa-solid fa-comments"></i>
+        </div>
+    </div>
+` : `
+    <a href="/post/${report.reportable.id}" class="ri-thumb t1">
+        ${isVideo ? `
+            <video style="object-fit: cover; object-position: center; width: 100%; height: 100%; pointer-events: none;"
+                   muted
+                   preload="metadata"
+                   playsinline
+                   disablepictureinpicture
+                   disableremoteplayback>
+                <source src="${postPath}" type="video/${fileExtension}">
+            </video>
+        ` : `
+            <img src="${postPath}"
+                 alt="Post image"
+                 loading="lazy"
+                 style="object-fit: cover; object-position: center; width: 100%; height: 100%;">
+        `}
+    </a>
+`}
+` : ''}
                 <div class="ri-info">
                     <div class="ri-reason">${subjectLabel}</div>
                     <div class="ri-target">Post by ${username ? '@' + username : ''}</div>
@@ -358,48 +364,49 @@
             document.getElementById("detailReasons").textContent = reasons;
             const preview = document.getElementById("detailPreview");
 
-            if (item.dataset.isVideo === "1") {
+            if (item.dataset.type === "comment") {
+
+                preview.innerHTML = '';
+
+            } else if (item.dataset.isVideo === "1") {
 
                 preview.innerHTML = `
-            <div class="preview-video-wrapper">
-                <video
-                    id="detailVideo"
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                    disablepictureinpicture
-                    controlsList="nodownload nofullscreen noplaybackrate"
-                >
-                    <source src="${item.dataset.image}">
-                </video>
+        <div class="preview-video-wrapper">
+            <video
+                id="detailVideo"
+                autoplay
+                muted
+                loop
+                playsinline
+                disablepictureinpicture
+                controlsList="nodownload nofullscreen noplaybackrate"
+            >
+                <source src="${item.dataset.image}">
+            </video>
 
-                <button
-                    id="muteToggle"
-                    class="mute-btn">
-                    🔇
-                </button>
-            </div>
-        `;
+            <button
+                id="muteToggle"
+                class="mute-btn">
+                🔇
+            </button>
+        </div>
+    `;
 
                 const video = document.getElementById("detailVideo");
                 const muteBtn = document.getElementById("muteToggle");
 
                 muteBtn.onclick = function () {
-
                     video.muted = !video.muted;
-
                     muteBtn.textContent = video.muted ? "🔇" : "🔊";
-
                 };
 
             } else {
 
                 preview.innerHTML = `
-            <img
-                src="${item.dataset.image}"
-                style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
-        `;
+        <img
+            src="${item.dataset.image}"
+            style="width:100%;height:100%;object-fit:cover;border-radius:10px;">
+    `;
 
             }
 

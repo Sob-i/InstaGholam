@@ -103,7 +103,6 @@
                     <line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
                 Reports
-                <span class="badge">{{$data['reportsCount']->count()}}</span>
             </a>
             <a href="#" class="nav-link">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
