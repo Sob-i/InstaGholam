@@ -31,7 +31,7 @@ class profileServices
             return true;
 
         return followsModel::where('follower_id', $viewer->id)
-            ->where('followed_id', $owner->id)
+            ->where('followed_id', $owner->id)->where('status', 'accepted')
             ->exists();
     }
     public function ShowProfile($user)

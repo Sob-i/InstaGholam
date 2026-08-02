@@ -67,7 +67,7 @@ class notificationsServices
                     ->where('followed_id', $notification->user_id)
                     ->exists();
             } else {
-                $notification->isFollowed = followsModel::where('follower_id', $notification->target_user_id)
+                $notification->isFollowed = followsModel::where('followed_id', $notification->target_user_id)->where('status', 'accepted')
                     ->exists();
             }
 

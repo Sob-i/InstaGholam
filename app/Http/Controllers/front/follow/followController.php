@@ -91,7 +91,7 @@ class followController extends Controller
         $request = followsModel::where('follower_id', $id)->where('followed_id', Auth::id())->update(['status' => 'accepted']);
         if ($request) {
             User::where('id', Auth::id())->increment('followers');
-            User::wher('id',$id)->increment('following');
+            User::where('id',$id)->increment('following');
             return back()->with('success', 'Accepted successfully');
         }
         return back()->with('fail', 'Something went wrong');
