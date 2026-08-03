@@ -61,6 +61,9 @@ Route::middleware('auth')->group(function () {
         // Notifications
         Route::get('notifications', [frontController::class, 'notificationsShow'])->name('notifications.show');
 
+        // Messages
+        Route::get('messages', [frontController::class, 'messagesShow'])->name('messages.show');
+
         // Profile
         Route::get('profile/{username}', [frontController::class, 'profile'])->name('profile');
         Route::get('profile/{username}/edit', [profileController::class, 'showEditProfile'])->name('profile.edit.show');

@@ -1,0 +1,114 @@
+@extends('layouts.front.messages.main')
+@section('content')
+    <div class="main">
+        <div class="messages-col">
+            <!-- header -->
+            <div class="page-header">
+                <span class="page-icon">✉️</span>
+                <span class="page-title">Messages</span>
+            </div>
+            <div class="page-sub">Your conversations — tap any thread to open.</div>
+
+            <!-- search (reused from close-friends) -->
+            <div class="search-wrap">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input type="text" placeholder="Search messages…" />
+            </div>
+
+            <!-- thread list -->
+            <div class="thread-list">
+                <!-- thread 1 -->
+                <div class="thread-item">
+                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23c8f04d'/%3E%3Ctext x='14' y='32' font-size='22' fill='black' font-family='Inter'%3E🌟%3C/text%3E%3C/svg%3E" alt="user"></div>
+                    <div class="thread-info">
+                        <div class="thread-name">luna_art <span class="badge">CF</span></div>
+                        <div class="thread-preview">❤️ that new series is fire! 🔥</div>
+                    </div>
+                    <div class="thread-meta">
+                        <span class="thread-time">2m</span>
+                        <span class="thread-unread">3</span>
+                    </div>
+                </div>
+                <!-- thread 2 -->
+                <div class="thread-item">
+                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%237c5cfc'/%3E%3Ctext x='14' y='32' font-size='22' fill='white' font-family='Inter'%3E🚀%3C/text%3E%3C/svg%3E" alt="user"></div>
+                    <div class="thread-info">
+                        <div class="thread-name">mike.trail</div>
+                        <div class="thread-preview">See you at the summit tomorrow? ⛰️</div>
+                    </div>
+                    <div class="thread-meta">
+                        <span class="thread-time">1h</span>
+                        <span class="thread-unread" style="background:transparent; color:var(--muted);">1</span>
+                    </div>
+                </div>
+                <!-- thread 3 -->
+                <div class="thread-item">
+                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23fc5c7d'/%3E%3Ctext x='14' y='32' font-size='22' fill='white' font-family='Inter'%3E🎨%3C/text%3E%3C/svg%3E" alt="user"></div>
+                    <div class="thread-info">
+                        <div class="thread-name">studio_nxt</div>
+                        <div class="thread-preview">Thanks for the feedback! 🙌</div>
+                    </div>
+                    <div class="thread-meta">
+                        <span class="thread-time">3h</span>
+                        <span class="thread-unread" style="background:transparent; color:var(--muted);">•</span>
+                    </div>
+                </div>
+                <!-- thread 4 -->
+                <div class="thread-item">
+                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23ffd200'/%3E%3Ctext x='14' y='32' font-size='22' fill='black' font-family='Inter'%3E🌊%3C/text%3E%3C/svg%3E" alt="user"></div>
+                    <div class="thread-info">
+                        <div class="thread-name">surf.diaries</div>
+                        <div class="thread-preview">waves are pumping today! 🏄</div>
+                    </div>
+                    <div class="thread-meta">
+                        <span class="thread-time">yesterday</span>
+                        <span class="thread-unread" style="background:transparent; color:var(--muted);">2</span>
+                    </div>
+                </div>
+                <!-- thread 5 -->
+                <div class="thread-item">
+                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%2343e97b'/%3E%3Ctext x='14' y='32' font-size='22' fill='black' font-family='Inter'%3E📸%3C/text%3E%3C/svg%3E" alt="user"></div>
+                    <div class="thread-info">
+                        <div class="thread-name">lena_arts</div>
+                        <div class="thread-preview">just posted a new reel!</div>
+                    </div>
+                    <div class="thread-meta">
+                        <span class="thread-time">2d</span>
+                        <span class="thread-unread" style="background:transparent; color:var(--muted);">•</span>
+                    </div>
+                </div>
+                <!-- thread 6 (no unread) -->
+                <div class="thread-item">
+                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23a18cd1'/%3E%3Ctext x='14' y='32' font-size='22' fill='white' font-family='Inter'%3E🎧%3C/text%3E%3C/svg%3E" alt="user"></div>
+                    <div class="thread-info">
+                        <div class="thread-name">melodic_me</div>
+                        <div class="thread-preview">check out my new track 🎵</div>
+                    </div>
+                    <div class="thread-meta">
+                        <span class="thread-time">3d</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- optional "request" section like notifications style -->
+            <div style="margin-top: 12px; border-top: 1px solid var(--border); padding-top: 20px;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                    <span style="font-size: 16px;">📨</span>
+                    <span style="font-weight: 600;">Message requests</span>
+                    <span style="background: var(--accent); color: #000; font-size: 11px; padding: 0 8px; border-radius: 12px; line-height: 20px;">2</span>
+                </div>
+                <div class="thread-item" style="background: transparent; border: 1px dashed var(--border);">
+                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23f7971e'/%3E%3Ctext x='14' y='32' font-size='22' fill='black' font-family='Inter'%3E👤%3C/text%3E%3C/svg%3E" alt="user"></div>
+                    <div class="thread-info">
+                        <div class="thread-name">nova_explorer</div>
+                        <div class="thread-preview" style="color: var(--accent);">Request from nova_explorer</div>
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="follow-btn" style="background: var(--accent); color: #000;">Accept</button>
+                        <button class="follow-btn" style="background: transparent; border-color: var(--border); color: var(--muted);">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

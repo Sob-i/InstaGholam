@@ -38,6 +38,10 @@ class frontController extends Controller
         $notifications = $this->notificationsServices->NotificationData($user);
         return view('index.notifications.notifications', compact('user', 'notifications'));
     }
+    public function messagesShow()
+    {
+        return view('index.messages.messages');
+    }
     public function profile($username)
     {
         $user = User::where('username', $username)->first();

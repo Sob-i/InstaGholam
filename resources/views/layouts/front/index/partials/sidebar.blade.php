@@ -18,7 +18,7 @@
         <a href="{{route('notifications.show')}}" class="nav-link">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>Notifications
         </a>
-        <a href="messages.html" class="nav-link">
+        <a href="{{route('messages.show')}}" class="nav-link">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Messages
         </a>
         <a href="{{route('profile',Auth::user()->username)}}" class="nav-link">
