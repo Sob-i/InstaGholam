@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\chat\chatModel;
 use App\Models\closeFriend\closeFriendModel;
 use App\Models\posts\postsSaveModel;
 use App\Models\user\followsModel;
@@ -54,24 +55,24 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
     public function posts()
     {
         return $this->hasMany(postModel::class, 'user_id', 'id');
     }
-
     public function savedPosts()
     {
         return $this->hasMany(postsSaveModel::class, 'user_id', 'id');
     }
-
     public function followers()
     {
        return $this->hasMany(followsModel::class, 'follower_id', 'id');
     }
-
     public function closeFriend()
     {
         return $this->hasMany(closeFriendModel::class, 'friend_id', 'id');
+    }
+    public function Chats()
+    {
+        return $this->belongsToMany(chatModel::class, 'chat_members', 'user_id', 'chat_id');
     }
 }

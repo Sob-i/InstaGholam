@@ -20,6 +20,8 @@ use App\Http\Controllers\admin\adminDashboard\postsDashboardController;
 
 use App\Http\Controllers\front\report\reportController;
 
+use App\Http\Controllers\front\messages\messageController;
+
 
 
     // Login && SignUp Form
@@ -61,8 +63,9 @@ Route::middleware('auth')->group(function () {
         // Notifications
         Route::get('notifications', [frontController::class, 'notificationsShow'])->name('notifications.show');
 
-        // Messages
+        // Messages (chat)
         Route::get('messages', [frontController::class, 'messagesShow'])->name('messages.show');
+        Route::get('message/{userId}', [messageController::class, 'messagePageShow'])->name('message.page.show');
 
         // Profile
         Route::get('profile/{username}', [frontController::class, 'profile'])->name('profile');

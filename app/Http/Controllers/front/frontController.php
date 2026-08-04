@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\front;
 
 use App\Http\Controllers\Controller;
+use App\Models\chat\chatModel;
 use App\Models\notifications\notificationModel;
 use App\Models\User;
 use App\Models\user\followsModel;
@@ -40,7 +41,8 @@ class frontController extends Controller
     }
     public function messagesShow()
     {
-        return view('index.messages.messages');
+        $user = User::where('id', Auth::id())->with(['Chats.messages','Chats.members'])->first();
+        return view('index.messages.messages',compact('user'));
     }
     public function profile($username)
     {

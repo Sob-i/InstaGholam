@@ -18,76 +18,29 @@
             <!-- thread list -->
             <div class="thread-list">
                 <!-- thread 1 -->
-                <div class="thread-item">
-                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23c8f04d'/%3E%3Ctext x='14' y='32' font-size='22' fill='black' font-family='Inter'%3E🌟%3C/text%3E%3C/svg%3E" alt="user"></div>
-                    <div class="thread-info">
-                        <div class="thread-name">luna_art <span class="badge">CF</span></div>
-                        <div class="thread-preview">❤️ that new series is fire! 🔥</div>
+                @forelse($user->Chats as $chat)
+                    <div class="thread-item">
+                        @forelse($chat->members as $member)
+                            @if($member->id != $user->id)
+                                <div class="thread-avatar"><img src="{{asset('/users/avatar/'.$member->avatar)}}" alt="user"></div>
+                                <div class="thread-info">
+                                    <a href="{{route('message.page.show', $member->id)}}" style="text-decoration: none; color: white;">
+                                    <div class="thread-name">{{$member->username}}</div>
+                                    <div class="thread-preview">❤️ that new series is fire! 🔥</div>
+                                    </a>
+                                </div>
+                            @endif
+                        @empty
+                        @endforelse
+                        <div class="thread-meta">
+                            <span class="thread-time">2m</span>
+                            <span class="thread-unread">3</span>
+                        </div>
                     </div>
-                    <div class="thread-meta">
-                        <span class="thread-time">2m</span>
-                        <span class="thread-unread">3</span>
-                    </div>
-                </div>
-                <!-- thread 2 -->
-                <div class="thread-item">
-                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%237c5cfc'/%3E%3Ctext x='14' y='32' font-size='22' fill='white' font-family='Inter'%3E🚀%3C/text%3E%3C/svg%3E" alt="user"></div>
-                    <div class="thread-info">
-                        <div class="thread-name">mike.trail</div>
-                        <div class="thread-preview">See you at the summit tomorrow? ⛰️</div>
-                    </div>
-                    <div class="thread-meta">
-                        <span class="thread-time">1h</span>
-                        <span class="thread-unread" style="background:transparent; color:var(--muted);">1</span>
-                    </div>
-                </div>
-                <!-- thread 3 -->
-                <div class="thread-item">
-                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23fc5c7d'/%3E%3Ctext x='14' y='32' font-size='22' fill='white' font-family='Inter'%3E🎨%3C/text%3E%3C/svg%3E" alt="user"></div>
-                    <div class="thread-info">
-                        <div class="thread-name">studio_nxt</div>
-                        <div class="thread-preview">Thanks for the feedback! 🙌</div>
-                    </div>
-                    <div class="thread-meta">
-                        <span class="thread-time">3h</span>
-                        <span class="thread-unread" style="background:transparent; color:var(--muted);">•</span>
-                    </div>
-                </div>
-                <!-- thread 4 -->
-                <div class="thread-item">
-                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23ffd200'/%3E%3Ctext x='14' y='32' font-size='22' fill='black' font-family='Inter'%3E🌊%3C/text%3E%3C/svg%3E" alt="user"></div>
-                    <div class="thread-info">
-                        <div class="thread-name">surf.diaries</div>
-                        <div class="thread-preview">waves are pumping today! 🏄</div>
-                    </div>
-                    <div class="thread-meta">
-                        <span class="thread-time">yesterday</span>
-                        <span class="thread-unread" style="background:transparent; color:var(--muted);">2</span>
-                    </div>
-                </div>
-                <!-- thread 5 -->
-                <div class="thread-item">
-                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%2343e97b'/%3E%3Ctext x='14' y='32' font-size='22' fill='black' font-family='Inter'%3E📸%3C/text%3E%3C/svg%3E" alt="user"></div>
-                    <div class="thread-info">
-                        <div class="thread-name">lena_arts</div>
-                        <div class="thread-preview">just posted a new reel!</div>
-                    </div>
-                    <div class="thread-meta">
-                        <span class="thread-time">2d</span>
-                        <span class="thread-unread" style="background:transparent; color:var(--muted);">•</span>
-                    </div>
-                </div>
-                <!-- thread 6 (no unread) -->
-                <div class="thread-item">
-                    <div class="thread-avatar"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' fill='%23a18cd1'/%3E%3Ctext x='14' y='32' font-size='22' fill='white' font-family='Inter'%3E🎧%3C/text%3E%3C/svg%3E" alt="user"></div>
-                    <div class="thread-info">
-                        <div class="thread-name">melodic_me</div>
-                        <div class="thread-preview">check out my new track 🎵</div>
-                    </div>
-                    <div class="thread-meta">
-                        <span class="thread-time">3d</span>
-                    </div>
-                </div>
+
+                @empty
+
+                @endforelse
             </div>
 
             <!-- optional "request" section like notifications style -->

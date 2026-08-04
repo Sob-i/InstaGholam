@@ -55,7 +55,9 @@
                                 {{ $data['isFollowed'] ? 'Following' : 'Requested' }}
                             </sapn>
                         @endif
-
+                        <a href="{{route('message.page.show',$user->id)}}" class="btn-edit" style="text-decoration: none">
+                            <i class="fa-solid fa-message"></i>
+                        </a>
                     @endif
                 </div>
                 <div class="profile-stats">
