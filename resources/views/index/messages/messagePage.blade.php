@@ -1,4 +1,4 @@
-@extends('layouts.front.messages.main')
+@extends('layouts.front.messageSingle.main')
 @section('content')
     <div class="main">
         <div class="messages-col">
@@ -18,6 +18,7 @@
                     <div class="thread-user">
                         @forelse($chat->members as $member)
                             @if($member->id != auth()->id())
+                                <input type="hidden" id="receiver_id" value="{{$member->id}}">
                                 <div class="avatar"><img src="{{asset('users/avatar/'.$member->avatar)}}" alt="{{$member->username}}"></div>
                                 <div>
                                     <div class="name">{{$member->username}}</div>
@@ -41,11 +42,12 @@
                                 {{$message->message}}
                                 <span class="time">{{$message->created_at->diffForHumans()}}</span>
                             </div>
+                        @else
+                            <div class="message received">
+                                {{$message->message}}
+                                <span class="time">{{$message->created_at->diffForHumans()}}</span>
+                            </div>
                         @endif
-                        <div class="message received">
-                            {{$message->message}}
-                            <span class="time">{{$message->created_at->diffForHumans()}}</span>
-                        </div>
                     @empty
                         There is no message yet Send something and start the conversation!
                     @endforelse
@@ -53,11 +55,12 @@
 
                 <!-- input -->
                 <div class="thread-input">
-                    <input type="text" placeholder="Type a message…" />
-                    <button class="send-btn" onclick="alert('Message sent!')">Send</button>
+                    <input type="text" id="message_txt" placeholder="Type a message…" />
+                    <button class="send-btn">Send</button>
                 </div>
             </div>
 
         </div>
     </div>
+
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\front\messages;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\chat\createChatRequest;
+use App\Http\Requests\messages\sendMessageRequest;
 use App\Models\chat\chatModel;
 use App\Models\User;
 use App\Services\messagesServices\messageServices;
@@ -19,5 +20,33 @@ class messageController extends Controller
     {
         $chat = $this->messageServices->ShowOrCreateChat($id);
         return view('index.messages.messagePage',compact('chat',));
+    }
+
+    public function sendMessage($userId,sendMessageRequest $request)
+    {
+        $request->validated();
+
+        $data = [
+            'chat_id' => $request->get('chat_id'),
+            'sender_id' => $userId,
+            'receiver_id' => $request->get('receiver_id'),
+            'message' => $request->get('message'),
+            'attachments' => $request->get('attachments') ?? null,
+            'type' => $request->get('type'),
+        ];
+
+        $message = $this->messageServices->SendMessage($data);
+
+        if($message){
+            return response()->json([
+                'success' => true,
+                'message' => $message->message,
+                'notif' => 'message send successfully',
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'notif' => 'Sorry, something went wrong'
+        ]);
     }
 }

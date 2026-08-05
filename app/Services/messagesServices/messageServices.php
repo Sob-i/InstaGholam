@@ -43,5 +43,16 @@ class messageServices
             ->whereHas('members', function ($q) use ($senderUid) {$q->where('user_id', $senderUid);})
             ->whereHas('members', function ($q) use ($receiverUid) {$q->where('user_id', $receiverUid);})->with(['members','messages'])->first();
     }
+    public function SendMessage(array $data)
+    {
+        return  messageModel::create([
+            'chat_id' => $data['chat_id'],
+            'sender_id' => $data['sender_id'],
+            'receiver_id' => $data['receiver_id'],
+            'message' => $data['message'],
+            'attachments' => $data['attachments'],
+            'type' => $data['type'],
+        ]);
 
+    }
 }
