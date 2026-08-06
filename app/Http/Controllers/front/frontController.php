@@ -41,7 +41,7 @@ class frontController extends Controller
     }
     public function messagesShow()
     {
-        $user = User::where('id', Auth::id())->with(['Chats.messages','Chats.members'])->first();
+        $user = User::where('id', Auth::id())->with(['Chats.messages','Chats.LastMessage','Chats.members'])->first();
         return view('index.messages.messages',compact('user'));
     }
     public function profile($username)

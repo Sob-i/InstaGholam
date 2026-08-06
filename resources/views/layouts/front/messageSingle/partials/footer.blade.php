@@ -9,5 +9,6 @@
     };
 </script>
 <script src="{{asset('frontJs/messages/sendMessage.js')}}"></script>
+<script src="{{asset('frontJs/messages/searchMessage.js')}}"></script>
 </body>
 </html>

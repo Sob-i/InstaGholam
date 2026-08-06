@@ -26,16 +26,17 @@
                                 <div class="thread-info">
                                     <a href="{{route('message.page.show', $member->id)}}" style="text-decoration: none; color: white;">
                                     <div class="thread-name">{{$member->username}}</div>
-                                    <div class="thread-preview">❤️ that new series is fire! 🔥</div>
+                                    <div class="thread-preview">{{$chat->LastMessage->message}}</div>
                                     </a>
+                                </div>
+                                <div class="thread-meta">
+                                    <span class="thread-time" style="color: white">{{$chat->LastMessage->created_at->diffForHumans()}}</span>
+                                    <span class="thread-unread">3</span>
                                 </div>
                             @endif
                         @empty
                         @endforelse
-                        <div class="thread-meta">
-                            <span class="thread-time">2m</span>
-                            <span class="thread-unread">3</span>
-                        </div>
+
                     </div>
 
                 @empty

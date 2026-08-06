@@ -3,8 +3,6 @@
 namespace App\Services\messagesServices;
 
 
-use App\Http\Requests\chat\createChatRequest;
-use App\Models\chat\chatMembersModel;
 use App\Models\chat\chatModel;
 use App\Models\chat\messageModel;
 use Illuminate\Support\Facades\Auth;
@@ -54,5 +52,9 @@ class messageServices
             'type' => $data['type'],
         ]);
 
+    }
+    public function SearchForMessage($chatId ,$word)
+    {
+        return messageModel::where('chat_id',$chatId)->whereRaw('message REGEXP ?', ['(^|[[:space:]])' . $word . '([[:space:]]|$)'])->get();
     }
 }

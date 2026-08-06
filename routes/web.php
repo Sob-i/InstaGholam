@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function () {
         Route::get('messages', [frontController::class, 'messagesShow'])->name('messages.show');
         Route::get('message/{userId}', [messageController::class, 'messagePageShow'])->name('message.page.show');
         Route::post('message/{userId}/send', [messageController::class, 'sendMessage'])->name('message.send');
+        Route::get('message/{chatId}/search', [messageController::class, 'searchMessage'])->name('message.search');
 
         // Profile
         Route::get('profile/{username}', [frontController::class, 'profile'])->name('profile');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\chat\createChatRequest;
 use App\Http\Requests\messages\sendMessageRequest;
 use App\Models\chat\chatModel;
+use App\Models\chat\messageModel;
 use App\Models\User;
 use App\Services\messagesServices\messageServices;
 use Illuminate\Http\Request;
@@ -19,9 +20,8 @@ class messageController extends Controller
     public function messagePageShow($id)
     {
         $chat = $this->messageServices->ShowOrCreateChat($id);
-        return view('index.messages.messagePage',compact('chat',));
+        return view('index.messages.messagePage',compact('chat'));
     }
-
     public function sendMessage($userId,sendMessageRequest $request)
     {
         $request->validated();
@@ -47,6 +47,23 @@ class messageController extends Controller
         return response()->json([
             'success' => false,
             'notif' => 'Sorry, something went wrong'
+        ]);
+    }
+    public function searchMessage($chatId , Request $request)
+    {
+        $word = $request->get('word');
+
+        $searchedWord = $this->messageServices->SearchForMessage($chatId , $word);
+
+        if($searchedWord->isNotEmpty()){
+            return response()->json([
+                'success' => true,
+                'wordsFound' => $searchedWord,
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'wordsFound' => 'no word found'
         ]);
     }
 }
