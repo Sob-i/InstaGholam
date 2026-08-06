@@ -30,8 +30,8 @@
                                     </a>
                                 </div>
                                 <div class="thread-meta">
-                                    <span class="thread-time" style="color: white">{{$chat->LastMessage->created_at->diffForHumans()}}</span>
                                     <span class="thread-unread">3</span>
+                                    <span class="thread-time" style="color: white">{{$chat->LastMessage->created_at->diffForHumans()}}</span>
                                 </div>
                             @endif
                         @empty
