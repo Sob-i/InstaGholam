@@ -23,4 +23,10 @@ class messageModel extends Model
     {
         return $this->hasOne(User::class , 'id' , 'receiver_id');
     }
+    public function getIsSeenMessageAttribute()
+    {
+        $userId = $this->receiver_id;
+        $lastRead = chatMembersModel::where('chat_id',$this->chat_id)->where('user_id',$userId)->first();
+        return $lastRead->last_read;
+    }
 }

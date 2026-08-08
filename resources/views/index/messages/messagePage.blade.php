@@ -40,7 +40,11 @@
                         @if($message->sender_id == auth()->id())
                             <div class="message sent">
                                 {{$message->message}}
-                                <span class="time">{{$message->created_at->diffForHumans()}}</span>
+                                @if($message->IsSeenMessage >= $message->id)
+                                    <span class="time">{{$message->created_at->diffForHumans()}} <i class="fa-solid fa-check-double"></i></span>
+                                @else
+                                    <span class="time">{{$message->created_at->diffForHumans()}} <i class="fa-solid fa-check"></i></span>
+                                @endif
                             </div>
                         @else
                             <div class="message received">
