@@ -9,12 +9,6 @@
             </div>
             <div class="page-sub">Your conversations — tap any thread to open.</div>
 
-            <!-- search (reused from close-friends) -->
-            <div class="search-wrap">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-                <input type="text" placeholder="Search messages…" />
-            </div>
-
             <!-- thread list -->
             <div class="thread-list">
                 <!-- thread 1 -->
@@ -30,7 +24,9 @@
                                     </a>
                                 </div>
                                 <div class="thread-meta">
-                                    <span class="thread-unread">3</span>
+                                    @if($chat->lastReadMessageCount)
+                                        <span class="thread-unread">{{$chat->lastReadMessageCount}}</span>
+                                    @endif
                                     <span class="thread-time" style="color: white">{{$chat->LastMessage->created_at->diffForHumans()}}</span>
                                 </div>
                             @endif

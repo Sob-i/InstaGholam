@@ -3,8 +3,10 @@
 namespace App\Services\messagesServices;
 
 
+use App\Models\chat\chatMembersModel;
 use App\Models\chat\chatModel;
 use App\Models\chat\messageModel;
+use App\Models\chat\messageReadsModel;
 use Illuminate\Support\Facades\Auth;
 
 class messageServices
@@ -57,4 +59,22 @@ class messageServices
     {
         return messageModel::where('chat_id',$chatId)->whereRaw('message REGEXP ?', ['(^|[[:space:]])' . $word . '([[:space:]]|$)'])->get();
     }
+    public function MarkAsRead($chatId)
+    {
+        $userId = Auth::id();
+        $lastReadMessage = chatMembersModel::where('user_id',$userId)->where('chat_id',$chatId)->first();
+        $unReadMessages = messageModel::where('chat_id',$chatId)->where('id','>',$lastReadMessage->last_read ?? 0)->where('sender_id','!=',$userId)->get();
+        $lastMessage = $unReadMessages->last();
+        if ($unReadMessages->isNotEmpty()) {
+            foreach ($unReadMessages as $Messages) {
+                messageReadsModel::create([
+                    'user_id' => $userId,
+                    'message_id' => $Messages->id,
+                    'read_at' => now()
+                ]);
+            }
+            chatMembersModel::where('user_id',$userId)->where('chat_id',$chatId)->update(['last_read' => $lastMessage->id]);
+        }
+    }
 }
+

@@ -20,6 +20,7 @@ class messageController extends Controller
     public function messagePageShow($id)
     {
         $chat = $this->messageServices->ShowOrCreateChat($id);
+        $this->messageServices->MarkAsRead($chat->id);
         return view('index.messages.messagePage',compact('chat'));
     }
     public function sendMessage($userId,sendMessageRequest $request)
