@@ -55,6 +55,11 @@
                     @empty
                         There is no message yet Send something and start the conversation!
                     @endforelse
+                    @if($chat->messages)
+                            <button id="scrollToBottom" class="scroll-bottom-btn">
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
+                    @endif
                 </div>
 
                 <!-- input -->
