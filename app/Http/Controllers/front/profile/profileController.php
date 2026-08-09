@@ -67,4 +67,36 @@ class profileController extends Controller
         $user = Auth::user();
         return $this->profileServices->CloseFriendToggle($user);
     }
+    public function showFollowers()
+    {
+        $userId = Auth::id();
+        $followers = $this->profileServices->showFollowers($userId);
+        if ($followers)
+        {
+            return response()->json([
+                'status' => true,
+                'data' => $followers
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong!'
+        ]);
+    }
+    public function showFollowings()
+    {
+        $userId = Auth::id();
+        $followings = $this->profileServices->showFollowings($userId);
+        if ($followings)
+        {
+            return response()->json([
+                'status' => true,
+                'data' => $followings
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong!'
+        ]);
+    }
 }

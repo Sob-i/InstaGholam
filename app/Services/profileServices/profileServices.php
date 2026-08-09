@@ -160,5 +160,13 @@ class profileServices
             ], 500);
         }
     }
+    public function ShowFollowers($userId)
+    {
+        return followsModel::where('follower_id', $userId)->with('userInfo')->get();
+    }
+    public function ShowFollowings($userId)
+    {
+        return followsModel::where('follower_id', $userId)->with('userInfo')->get();
+    }
 
 }

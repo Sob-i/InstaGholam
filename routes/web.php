@@ -70,6 +70,8 @@ Route::middleware('auth')->group(function () {
         Route::get('message/{chatId}/search', [messageController::class, 'searchMessage'])->name('message.search');
 
         // Profile
+        Route::get('profile/showFollowers', [profileController::class, 'showFollowers'])->name('profile.followers.show');
+        Route::get('profile/showFollowings', [profileController::class, 'showFollowings'])->name('profile.followings.show');
         Route::get('profile/{username}', [frontController::class, 'profile'])->name('profile');
         Route::get('profile/{username}/edit', [profileController::class, 'showEditProfile'])->name('profile.edit.show');
         Route::put('profile/{username}/edit', [profileController::class, 'editProfile'])->name('profile.edit');
