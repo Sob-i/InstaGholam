@@ -115,27 +115,24 @@
                         <div class="highlights">
                             @if($user->id == auth()->id())
                                 <div class="highlight">
-                                    <div class="hl-ring add"><div class="hl-av h5">＋</div></div>
+                                    <a href="{{route('profile.highlights.show',$user->username)}}" style="text-decoration: none">
+                                        <div class="hl-ring add"><div class="hl-av h5">＋</div></div>
+                                    </a>
                                     <span class="hl-name">New</span>
                                 </div>
                             @endif
+                            @forelse($data['highlights'] as $highlight)
+                                <div class="highlight">
+                                    <div class="hl-ring"
+                                         style="background-image: url('{{asset('users/highlights/'.strstr($user->email, '@', true).'/'.$highlight->cover)}}');
+                                            background-size: cover;
+                                            background-position: center;">
+                                    </div>
+                                    <span class="hl-name">{{$highlight->title}}</span>
+                                </div>
+                            @empty
 
-                            <div class="highlight">
-                                <div class="hl-ring"><div class="hl-av h1"></div></div>
-                                <span class="hl-name">Lisbon</span>
-                            </div>
-                            <div class="highlight">
-                                <div class="hl-ring"><div class="hl-av h2"></div></div>
-                                <span class="hl-name">Morocco</span>
-                            </div>
-                            <div class="highlight">
-                                <div class="hl-ring"><div class="hl-av h3"></div></div>
-                                <span class="hl-name">Work</span>
-                            </div>
-                            <div class="highlight">
-                                <div class="hl-ring"><div class="hl-av h4"></div></div>
-                                <span class="hl-name">Studio</span>
-                            </div>
+                            @endforelse
                         </div>
 
                         <!-- Grid Tabs -->

@@ -5,6 +5,7 @@ namespace App\Services\profileServices;
 
 
 use App\Models\closeFriend\closeFriendModel;
+use App\Models\highlights\highlightsModel;
 use App\Models\posts\postModel;
 use App\Models\posts\postsSaveModel;
 use App\Models\User;
@@ -44,6 +45,7 @@ class profileServices
             $followersCount = $user->followers;
             $followingCount = $user->following;
             $isFollowed = false;
+            $highlights = highlightsModel::where('user_id' , $user->id)->get()->unique('user_id')->values();
             $followingIds = followsModel::where('follower_id', $user->id)
                 ->pluck('followed_id')
                 ->toArray();
@@ -73,6 +75,7 @@ class profileServices
                 'isCloseFriend' => $isCloseFriend,
                 'canViewProfile' => $this->CanViewProfile($Current, $owner),
                 'requested' => followsModel::where('follower_id', $Current->id)->where('status' , 'pending')->exists(),
+                'highlights' => $highlights,
             ];
 
     }
@@ -167,6 +170,29 @@ class profileServices
     public function ShowFollowings($userId)
     {
         return followsModel::where('follower_id', $userId)->with('userInfo')->get();
+    }
+    public function CreateHighlightCoverAndMove($cover,$title,$userEmail)
+    {
+        $name = 'highlightCover-' . $title . '-' . time() . '.' . $cover->getClientOriginalExtension();
+        $cover->move(public_path("users/highlights/$userEmail/") , $name);
+        return $name;
+    }
+    public function CreateHighlight(array $data)
+    {
+        $createdHighlights = [];
+
+        foreach ($data['stories'] as $storyId) {
+
+            $createdHighlights[] = highlightsModel::create([
+                'title' => $data['title'],
+                'cover' => $data['cover'],
+                'user_id' => Auth::id(),
+                'story_id' => $storyId,
+            ]);
+
+        }
+
+        return $createdHighlights;
     }
 
 }

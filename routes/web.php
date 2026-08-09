@@ -81,6 +81,9 @@ Route::middleware('auth')->group(function () {
         Route::put('profile/{id}/follow/acceptRequest', [followController::class, 'accept'])->name('profile.user.follow.accept');
         Route::get('profile/{username}/closeFriends', [profileController::class, 'closeFriendShow'])->name('profile.closeFriend.show');
         Route::post('profile/{username}/closeFriends', [profileController::class, 'toggle'])->name('profile.closeFriend.toggle');
+        // Highlights
+        Route::get('profile/{username}/highlights', [profileController::class, 'showHighlights'])->name('profile.highlights.show');
+        Route::post('profile/{username}/highlight/create', [profileController::class, 'createHighlight'])->name('profile.highlights.create');
 
         // Report
         Route::post('report/{Uid}', [reportController::class, 'Report'])->name('report.create');

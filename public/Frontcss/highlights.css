@@ -1,0 +1,529 @@
+:root {
+    --bg: #0a0a0a;
+    --surface: #111;
+    --surface2: #181818;
+    --border: #252525;
+    --text: #f0f0f0;
+    --muted: #777;
+    --accent: #c8f04d;
+    --accent2: #7c5cfc;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, sans-serif;
+    min-height: 100vh;
+}
+
+/* =========================================
+   PAGE
+========================================= */
+
+.highlight-page {
+    width: 100%;
+    max-width: 760px;
+    min-height: 100vh;
+    margin: 0 auto;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    background: var(--bg);
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.highlight-header {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 20px;
+
+    border-bottom: 1px solid var(--border);
+
+    position: sticky;
+    top: 0;
+    z-index: 20;
+
+    background: rgba(10, 10, 10, .94);
+    backdrop-filter: blur(12px);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.back-btn {
+    width: 38px;
+    height: 38px;
+
+    border: none;
+    background: transparent;
+
+    color: var(--text);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    transition: background .15s ease;
+}
+
+.back-btn:hover {
+    background: var(--surface2);
+}
+
+.back-btn svg {
+    width: 21px;
+    height: 21px;
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.done-btn {
+    border: none;
+    background: transparent;
+
+    color: var(--accent);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    padding: 8px 4px;
+}
+
+.done-btn:hover {
+    opacity: .75;
+}
+
+/* =========================================
+   COVER SECTION
+========================================= */
+
+.cover-section {
+    padding: 32px 24px 28px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.cover-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.cover {
+    width: 110px;
+    height: 110px;
+
+    border-radius: 50%;
+
+    padding: 3px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent2),
+            #fc5c7d,
+            #ffd200,
+            var(--accent)
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cover-inner {
+    width: 100%;
+    height: 100%;
+
+    border-radius: 50%;
+
+    border: 3px solid var(--bg);
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c5cfc,
+            #fc5c7d
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cover-inner img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+.cover-edit {
+    position: absolute;
+
+    right: -4px;
+    bottom: 0;
+
+    width: 32px;
+    height: 32px;
+
+    border-radius: 50%;
+
+    background: var(--surface2);
+
+    border: 1px solid var(--border);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: var(--text);
+}
+
+.cover-edit svg {
+    width: 15px;
+    height: 15px;
+}
+
+.cover-label {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* =========================================
+   NAME INPUT
+========================================= */
+
+.name-section {
+    padding: 22px 24px;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.input-label {
+    display: block;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    color: var(--muted);
+
+    margin-bottom: 8px;
+
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.name-input {
+    width: 100%;
+
+    height: 46px;
+
+    padding: 0 14px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    color: var(--text);
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color .15s ease,
+        background .15s ease;
+}
+
+.name-input:focus {
+    border-color: var(--accent);
+    background: var(--surface2);
+}
+
+.name-input::placeholder {
+    color: #555;
+}
+
+/* =========================================
+   STORIES HEADER
+========================================= */
+
+.stories-header {
+    padding: 22px 24px 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stories-title {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.selected-count {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* =========================================
+   STORY GRID
+========================================= */
+
+.stories-grid {
+    padding: 0 12px 100px;
+
+    display: grid;
+
+    grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+    gap: 4px;
+}
+
+.story {
+    position: relative;
+
+    aspect-ratio: 9 / 14;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    background: var(--surface2);
+}
+
+.story img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    transition:
+        transform .2s ease,
+        filter .2s ease;
+}
+
+.story:hover img {
+    transform: scale(1.04);
+}
+
+/* =========================================
+   STORY SELECTION
+========================================= */
+
+.story-check {
+    position: absolute;
+
+    top: 9px;
+    right: 9px;
+
+    width: 24px;
+    height: 24px;
+
+    border-radius: 50%;
+
+    border: 2px solid rgba(255,255,255,.9);
+
+    background: rgba(0,0,0,.3);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 5;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease;
+}
+
+.story-check svg {
+    width: 14px;
+    height: 14px;
+
+    opacity: 0;
+
+    transform: scale(.6);
+
+    transition:
+        opacity .15s ease,
+        transform .15s ease;
+}
+
+/* Selected story */
+
+.story.selected {
+    outline: 3px solid var(--accent);
+    outline-offset: -3px;
+}
+
+.story.selected img {
+    filter: brightness(.65);
+}
+
+.story.selected .story-check {
+    background: var(--accent);
+    border-color: var(--accent);
+
+    color: #0a0a0a;
+}
+
+.story.selected .story-check svg {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* =========================================
+   STORY DATE
+========================================= */
+
+.story-date {
+    position: absolute;
+
+    left: 8px;
+    bottom: 8px;
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    background: rgba(0,0,0,.55);
+
+    color: #fff;
+
+    font-size: 10px;
+
+    backdrop-filter: blur(4px);
+}
+
+/* =========================================
+   BOTTOM ACTION
+========================================= */
+
+.bottom-action {
+    position: fixed;
+
+    left: 50%;
+    bottom: 0;
+
+    transform: translateX(-50%);
+
+    width: min(760px, 100%);
+
+    padding: 14px 20px;
+
+    background: rgba(10,10,10,.94);
+
+    border-top: 1px solid var(--border);
+
+    backdrop-filter: blur(12px);
+
+    z-index: 30;
+}
+
+.create-btn {
+    width: 100%;
+
+    height: 46px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: var(--accent);
+
+    color: #0a0a0a;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        transform .15s ease,
+        opacity .15s ease;
+}
+
+.create-btn:hover {
+    opacity: .9;
+}
+
+.create-btn:active {
+    transform: scale(.98);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .highlight-page {
+        border: none;
+    }
+
+    .stories-grid {
+        grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+
+        gap: 3px;
+
+        padding-left: 3px;
+        padding-right: 3px;
+    }
+
+    .cover-section {
+        padding-top: 26px;
+    }
+
+    .name-section {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .stories-header {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .bottom-action {
+        width: 100%;
+    }
+}

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\front\profile;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\highlights\createHighlightRequest;
 use App\Http\Requests\profile\profileEditInfoReqeust;
 use App\Http\Requests\profile\profileEditPasswordReqeust;
 use App\Models\closeFriend\closeFriendModel;
 use App\Models\comments\commentModel;
 use App\Models\posts\postModel;
+use App\Models\story\storyModel;
 use App\Models\User;
 use App\Models\user\followsModel;
 use App\Services\profileServices\profileServices;
@@ -94,6 +96,39 @@ class profileController extends Controller
                 'data' => $followings
             ]);
         }
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong!'
+        ]);
+    }
+    public function showHighlights()
+    {
+        $highlights = storyModel::where('user_id', Auth::id())->where('status','archived')->orderBy('created_at','desc')->get();
+        return view('index.highlights.highlights', compact('highlights'));
+    }
+    public function createHighlight(createHighlightRequest $request)
+    {
+        $validated = $request->validated();
+
+        $user = strstr(Auth()->user()->email, '@', true);
+
+        $cover = $this->profileServices->CreateHighlightCoverAndMove($validated['cover'], $validated['title'], $user);
+
+        $data = [
+            'title' => $validated['title'],
+            'cover' => $cover,
+            'stories' => $validated['stories'],
+        ];
+
+        $createdHighlights = $this->profileServices->CreateHighlight($data);
+
+        if ($createdHighlights) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Highlight created successfully!'
+            ]);
+        }
+
         return response()->json([
             'status' => false,
             'message' => 'Something went wrong!'
