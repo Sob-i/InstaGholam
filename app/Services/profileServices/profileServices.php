@@ -45,7 +45,7 @@ class profileServices
             $followersCount = $user->followers;
             $followingCount = $user->following;
             $isFollowed = false;
-            $highlights = highlightsModel::where('user_id' , $user->id)->get()->unique('user_id')->values();
+            $highlights = highlightsModel::where('user_id' , $user->id)->get()->unique('cover')->values();
             $followingIds = followsModel::where('follower_id', $user->id)
                 ->pluck('followed_id')
                 ->toArray();
@@ -165,11 +165,11 @@ class profileServices
     }
     public function ShowFollowers($userId)
     {
-        return followsModel::where('follower_id', $userId)->with('userInfo')->get();
+        return followsModel::where('followed_id', $userId)->with('followerInfo')->get();
     }
     public function ShowFollowings($userId)
     {
-        return followsModel::where('follower_id', $userId)->with('userInfo')->get();
+        return followsModel::where('follower_id', $userId)->with('followingInfo')->get();
     }
     public function CreateHighlightCoverAndMove($cover,$title,$userEmail)
     {

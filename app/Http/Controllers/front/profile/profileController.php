@@ -69,9 +69,9 @@ class profileController extends Controller
         $user = Auth::user();
         return $this->profileServices->CloseFriendToggle($user);
     }
-    public function showFollowers()
+    public function showFollowers($username)
     {
-        $userId = Auth::id();
+        $userId = User::where('username', $username)->first()->id;
         $followers = $this->profileServices->showFollowers($userId);
         if ($followers)
         {
@@ -85,9 +85,9 @@ class profileController extends Controller
             'message' => 'Something went wrong!'
         ]);
     }
-    public function showFollowings()
+    public function showFollowings($username)
     {
-        $userId = Auth::id();
+        $userId = User::where('username', $username)->first()->id;
         $followings = $this->profileServices->showFollowings($userId);
         if ($followings)
         {

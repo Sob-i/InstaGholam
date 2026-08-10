@@ -361,7 +361,7 @@
         followersButton.addEventListener('click', function () {
             openFollowModal(
                 'Followers',
-                "{{ route('profile.followers.show') }}"
+                "{{ route('profile.followers.show' , $user->username) }}"
             );
         });
 
@@ -369,7 +369,7 @@
         followingButton.addEventListener('click', function () {
             openFollowModal(
                 'Following',
-                "{{ route('profile.followings.show') }}"
+                "{{ route('profile.followings.show', $user->username) }}"
             );
         });
 
@@ -426,18 +426,17 @@
             if (!users || users.length === 0) {
 
                 followList.innerHTML = `
-                <div class="follow-empty">
-                    No users found.
-                </div>
-            `;
+            <div class="follow-empty">
+                No users found.
+            </div>
+        `;
 
                 return;
             }
 
-
             users.forEach(follow => {
 
-                const user = follow.user_info ?? follow.userInfo;
+                const user = follow.follower_info ?? follow.following_info;
 
                 if (!user) {
                     return;
@@ -450,30 +449,28 @@
                     ? `/users/avatar/${user.avatar}`
                     : '/images/default-avatar.png';
 
-
                 followList.innerHTML += `
-                    <a href="/profile/${encodeURIComponent(username)}" class="follow-user">
+            <a href="/profile/${encodeURIComponent(username)}" class="follow-user" style="text-decoration: none;">
 
-                        <img
-                            src="${avatar}"
-                            class="follow-user-avatar"
-                            alt="${username}"
-                        >
+                <img
+                    src="${avatar}"
+                    class="follow-user-avatar"
+                    alt="${username}"
+                >
 
-                        <div class="follow-user-info">
+                <div class="follow-user-info">
 
-                            <div class="follow-user-username">
-                                ${username}
-                            </div>
+                    <div class="follow-user-username">
+                        ${username}
+                    </div>
 
-                            <div class="follow-user-name">
-                                ${name}
-                            </div>
+                    <div class="follow-user-name">
+                        ${name}
+                    </div>
+                </div>
 
-                        </div>
-
-                    </a>
-                `;
+            </a>
+        `;
             });
         }
 
