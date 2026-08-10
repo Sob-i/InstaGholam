@@ -184,6 +184,7 @@ nav {
 
 .btn-edit:hover {
     background: var(--border);
+    color: var(--accent);
 }
 
 .btn-follow {
@@ -218,6 +219,10 @@ nav {
     text-align: center;
 }
 
+.stat:hover{
+    color: var(--accent);
+}
+
 .stat-num {
     font-size: 18px;
     font-weight: 800;
@@ -225,7 +230,7 @@ nav {
 
 .stat-label {
     font-size: 13px;
-    color: var(--muted);
+    color: white;
 }
 
 .profile-bio {
@@ -247,7 +252,7 @@ nav {
 }
 
 .verified {
-    color: var(--accent2);
+    color: var(--accent);
     font-size: 13px;
     display: flex;
     align-items: center;
@@ -323,7 +328,7 @@ nav {
 
 .hl-name {
     font-size: 12px;
-    color: var(--muted);
+    color: white;
 }
 
 /* TABS */
@@ -1127,7 +1132,7 @@ nav {
 
 .hl-name {
     font-size: 12px;
-    color: #333;
+    color: white;
     max-width: 70px;
     overflow: hidden;
     text-overflow: ellipsis;

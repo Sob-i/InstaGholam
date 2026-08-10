@@ -137,6 +137,14 @@
                 Audit Log
             </a>
         </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Index</div>
+            <a href="{{route('homepage')}}" class="nav-link">
+                <i class="fa-solid fa-house"></i>
+                HomePage
+            </a>
+        </div>
     </nav>
 
     <a class="sidebar-user" href="{{ route('profile', Auth::user()->username) }}" style="text-decoration: none; color: white">

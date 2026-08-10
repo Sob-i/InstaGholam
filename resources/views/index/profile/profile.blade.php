@@ -14,7 +14,7 @@
                 <div class="profile-top">
                     <span class="profile-username">{{$user->username}}</span>
                     @if($user->role == 'verifiedUser' || $user->role == 'admin' )
-                        <span class="verified"><svg width="14" height="14" fill="var(--accent2)" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Verified</span>
+                        <span class="verified"><svg width="14" height="14" fill="var(--accent)" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Verified</span>
                     @endif
                     @if($user->id == auth()->id())
                         <a href="{{route('profile.edit.show',$user->username)}}" class="btn-edit" style="text-decoration: none">Edit Profile</a>
@@ -61,7 +61,10 @@
                     @endif
                 </div>
                 <div class="profile-stats">
-                    <div class="stat"><div class="stat-num">{{$data['postsCount']}}</div><div class="stat-label">Posts</div></div>
+                    <div class="stat">
+                        <div class="stat-num">{{$data['postsCount']}}</div>
+                        <div class="stat-label">Posts</div>
+                    </div>
                     <div class="stat" id="user-followers" style="cursor: pointer;">
                         <div class="stat-num">{{$data['followersCount']}}</div>
                         <div class="stat-label">Followers</div>

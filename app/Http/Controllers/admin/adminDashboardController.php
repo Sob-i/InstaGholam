@@ -20,12 +20,10 @@ class adminDashboardController extends Controller
         $user = auth()->user();
         $TotalUsers = User::all()->count();
         $todayPosts = postModel::where('created_at',today())->count();
-        $recentUsers = User::whereBetween('created_at', [
-            now()->startOfYear(),
-            now()->endOfYear()
-        ])->take(5)->get();
+        $recentUsers = User::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->whereIn('role', ['user' , 'verifiedUser'])->take(5)->get();
         $openReportsCount = reportModel::where('status', 'pending')->count();
-        return view('admin.dashboard.dashboard', compact('user', 'TotalUsers', 'todayPosts', 'recentUsers', 'openReportsCount'));
+        $suspendedUserCount = User::where('status', 'suspend')->count();
+        return view('admin.dashboard.dashboard', compact('user', 'TotalUsers', 'todayPosts', 'recentUsers', 'openReportsCount', 'suspendedUserCount'));
     }
     public function showUsers()
     {

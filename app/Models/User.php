@@ -75,4 +75,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(chatModel::class, 'chat_members', 'user_id', 'chat_id');
     }
+    public function getNewUsersCountAttribute()
+    {
+      return User::where('created_at','>',now()->subDays(30))->count();
+    }
 }

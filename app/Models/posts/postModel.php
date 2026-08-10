@@ -2,7 +2,7 @@
 
 namespace App\Models\posts;
 
-use App\Models\reports\reportModel;
+
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\comments\commentModel;

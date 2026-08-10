@@ -20,7 +20,10 @@
                 <div class="stat-card lime">
                     <div class="stat-label">Total Users</div>
                     <div class="stat-value">{{$TotalUsers}}</div>
-                    <div class="stat-delta delta-up">↑ 12.4% this month</div>
+                    @if($user->newUsersCount > 0)
+                        <div class="stat-delta delta-up">↑ {{$user->newUsersCount}} this month</div>
+                    @endif
+                    <div class="stat-delta">{{$user->newUsersCount}} this month</div>
                     <div class="stat-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
                 </div>
                 <div class="stat-card violet">
@@ -37,7 +40,7 @@
                 </div>
                 <div class="stat-card amber">
                     <div class="stat-label">Suspended Accounts</div>
-                    <div class="stat-value">1,087</div>
+                    <div class="stat-value">{{$suspendedUserCount}}</div>
                     <div class="stat-delta delta-down">↑ 22 this week</div>
                     <div class="stat-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
                 </div>
@@ -130,7 +133,12 @@
                                 <td><span class="badge-pill pill-green">{{$recentUser->status}}</span></td>
                             </tr>
                         @empty
-
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td>No Recent Users.</td>
+                                <td></td>
+                            </tr>
                         @endforelse
                         </tbody>
                     </table>
