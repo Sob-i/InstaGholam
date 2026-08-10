@@ -2,6 +2,7 @@
 
 namespace App\Models\highlights;
 
+use App\Models\story\storyModel;
 use Illuminate\Database\Eloquent\Model;
 
 class highlightsModel extends Model
@@ -14,4 +15,9 @@ class highlightsModel extends Model
         'user_id',
         'story_id'
     ];
+
+    public function stories()
+    {
+        return $this->hasMany(storyModel::class , 'id','story_id');
+    }
 }

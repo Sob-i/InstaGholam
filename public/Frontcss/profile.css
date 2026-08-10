@@ -862,3 +862,275 @@ nav {
     padding: 35px;
     color: #888;
 }
+
+/* Highlight Story Modal */
+.highlight-story-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.92);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.highlight-story-modal {
+    position: relative;
+    max-width: 420px;
+    width: 100%;
+    height: 100%;
+    max-height: 750px;
+    background: #000;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 500px) {
+    .highlight-story-modal {
+        max-height: 100vh;
+        border-radius: 0;
+        max-width: 100%;
+    }
+}
+
+/* Close Button */
+.highlight-story-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+}
+
+.highlight-story-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.highlight-story-close svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Header */
+.highlight-story-header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 15;
+}
+
+.highlight-story-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+}
+
+.highlight-story-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+}
+
+.highlight-story-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: white;
+}
+
+.highlight-story-count {
+    font-size: 12px;
+    opacity: 0.7;
+    color: white;
+    margin-left: auto;
+}
+
+/* Progress Container */
+.highlight-story-progress-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    gap: 4px;
+    z-index: 15;
+    padding: 0 10px;
+}
+
+.highlight-story-progress-bar-bg {
+    flex: 1;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.highlight-story-progress-bar-fill {
+    height: 100%;
+    background: white;
+    width: 0%;
+    transition: width 0.1s linear;
+    border-radius: 3px;
+}
+
+.highlight-story-progress-bar-fill.completed {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+/* Content */
+.highlight-story-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+}
+
+.highlight-story-media {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Tap Zones */
+.highlight-story-tap-zone {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 40%;
+    z-index: 10;
+    cursor: pointer;
+}
+
+.highlight-story-tap-zone-left {
+    left: 0;
+}
+
+.highlight-story-tap-zone-right {
+    right: 0;
+}
+
+/* Navigation Buttons */
+.highlight-story-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.4);
+    border: none;
+    color: white;
+    padding: 15px 10px;
+    cursor: pointer;
+    z-index: 15;
+    border-radius: 4px;
+    transition: background 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.highlight-story-nav:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.highlight-story-nav-prev {
+    left: 10px;
+}
+
+.highlight-story-nav-next {
+    right: 10px;
+}
+
+.highlight-story-nav svg {
+    width: 20px;
+    height: 20px;
+}
+
+@media (max-width: 600px) {
+    .highlight-story-nav {
+        display: none;
+    }
+}
+
+/* Unmute Button */
+.highlight-unmute-btn {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 20px;
+    cursor: pointer;
+    z-index: 20;
+    font-size: 14px;
+    backdrop-filter: blur(10px);
+    transition: background 0.3s;
+}
+
+.highlight-unmute-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Loading State */
+.highlight-story-loading {
+    color: white;
+    text-align: center;
+    padding: 40px;
+    font-size: 16px;
+}
+
+/* Highlight items styling */
+.highlight {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.highlight:hover {
+    transform: scale(1.05);
+}
+
+.hl-ring {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid #C8F04DFF;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hl-name {
+    font-size: 12px;
+    color: #333;
+    max-width: 70px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+}

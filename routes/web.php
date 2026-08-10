@@ -84,6 +84,7 @@ Route::middleware('auth')->group(function () {
         // Highlights
         Route::get('profile/{username}/highlights', [profileController::class, 'showHighlights'])->name('profile.highlights.show');
         Route::post('profile/{username}/highlight/create', [profileController::class, 'createHighlight'])->name('profile.highlights.create');
+        Route::get('profile/{username}/{highlight}/show', [profileController::class, 'showHighlight'])->name('profile.highlight.show');
 
         // Report
         Route::post('report/{Uid}', [reportController::class, 'Report'])->name('report.create');

@@ -8,6 +8,7 @@ use App\Http\Requests\profile\profileEditInfoReqeust;
 use App\Http\Requests\profile\profileEditPasswordReqeust;
 use App\Models\closeFriend\closeFriendModel;
 use App\Models\comments\commentModel;
+use App\Models\highlights\highlightsModel;
 use App\Models\posts\postModel;
 use App\Models\story\storyModel;
 use App\Models\User;
@@ -129,6 +130,21 @@ class profileController extends Controller
             ]);
         }
 
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong!'
+        ]);
+    }
+    public function showHighlight($username ,$highlight)
+    {
+        $items = highlightsModel::where('cover', $highlight)->orderBy('created_at','desc')->with('stories.user')->get();
+        if ($items)
+        {
+            return response()->json([
+                'status' => true,
+                'data' => $items
+            ]);
+        }
         return response()->json([
             'status' => false,
             'message' => 'Something went wrong!'
