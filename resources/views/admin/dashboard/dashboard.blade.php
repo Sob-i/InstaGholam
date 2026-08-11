@@ -19,7 +19,7 @@
             <div class="stat-grid">
                 <div class="stat-card lime">
                     <div class="stat-label">Total Users</div>
-                    <div class="stat-value">{{$TotalUsers}}</div>
+                    <div class="stat-value">{{$data['TotalUsers']}}</div>
                     @if($user->newUsersCount > 0)
                         <div class="stat-delta delta-up">↑ {{$user->newUsersCount}} this month</div>
                     @endif
@@ -28,20 +28,34 @@
                 </div>
                 <div class="stat-card violet">
                     <div class="stat-label">Posts Today</div>
-                    <div class="stat-value">{{$todayPosts}}</div>
-                    <div class="stat-delta delta-up">↑ 8.1% vs yesterday</div>
+                    <div class="stat-value">{{$data['todayPosts']}}</div>
+                    @if($data['postsAvg'] > 0)
+                        <div class="stat-delta delta-up">↑ {{$data['postsAvg']}}% vs yesterday</div>
+                    @elseif($data['postsAvg'] < 0)
+                        <div class="stat-delta delta-down">↓ {{$data['postsAvg']}}% vs yesterday</div>
+                    @else
+                        <div class="stat-delta ">No Changes vs yesterday</div>
+                    @endif
                     <div class="stat-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
                 </div>
                 <div class="stat-card red">
                     <div class="stat-label">Open Reports</div>
-                    <div class="stat-value">{{$openReportsCount}}</div>
-                    <div class="stat-delta delta-down">↑ 3 new since yesterday</div>
+                    <div class="stat-value">{{$data['openReportsCount']}}</div>
+                    @if($data['newOpenReportsCount'] > 0)
+                        <div class="stat-delta delta-down">↑ {{$data['newOpenReportsCount']}} new since yesterday</div>
+                    @else
+                        <div class="stat-delta ">No new reports since yesterday</div>
+                    @endif
                     <div class="stat-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
                 </div>
                 <div class="stat-card amber">
                     <div class="stat-label">Suspended Accounts</div>
-                    <div class="stat-value">{{$suspendedUserCount}}</div>
-                    <div class="stat-delta delta-down">↑ 22 this week</div>
+                    <div class="stat-value">{{$data['suspendedUserCount']}}</div>
+                    @if($data['thisMonthSuspendedUsers'] > 0)
+                        <div class="stat-delta delta-down">↑ {{$data['thisMonthSuspendedUsers']}} this month</div>
+                    @else
+                        <div class="stat-delta">Nothing this month</div>
+                    @endif
                     <div class="stat-icon"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div>
                 </div>
             </div>
@@ -86,22 +100,49 @@
                         <span class="card-title">Content Breakdown</span>
                         <span class="card-action">Details →</span>
                     </div>
+                    @php
+                        $photos = $data['contentBreakDown']['photos'];
+                        $videos = $data['contentBreakDown']['videos'];
+                    @endphp
+
                     <div class="donut-wrap">
-                        <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110">
-                            <!-- Donut segments via stroke-dasharray trick -->
-                            <circle cx="55" cy="55" r="40" fill="none" stroke="#1e2024" stroke-width="18"/>
-                            <!-- Photos 52% = 251 of 502 -->
-                            <circle cx="55" cy="55" r="40" fill="none" stroke="#c8f04d" stroke-width="18"
-                                    stroke-dasharray="130 251" stroke-dashoffset="63" transform="rotate(-90 55 55)"/>
-                            <!-- Videos 28% -->
-                            <circle cx="55" cy="55" r="40" fill="none" stroke="#7c5cfc" stroke-width="18"
-                                    stroke-dasharray="70 251" stroke-dashoffset="-67" transform="rotate(-90 55 55)"/>
-                            <text x="55" y="52" text-anchor="middle" fill="#f0f0f0" font-size="13" font-weight="800" font-family="Inter,sans-serif">18.3k</text>
-                            <text x="55" y="66" text-anchor="middle" fill="#5a5e6b" font-size="9" font-family="Inter,sans-serif">posts today</text>
+                        <svg class="donut-svg" width="145" height="145" viewBox="0 0 110 110">
+
+                            {{-- Photos --}}
+                            <circle cx="55" cy="55" r="43" fill="none" stroke="#c8f04d" stroke-width="18" pathLength="100"
+                                stroke-dasharray="{{ $photos }} {{ 100 - $photos }}"
+                                stroke-dashoffset="0"
+                                transform="rotate(-90 55 55)"/>
+
+                            {{-- Videos --}}
+                            <circle cx="55" cy="55" r="43" fill="none" stroke="#7c5cfc" stroke-width="18" pathLength="100"
+                                stroke-dasharray="{{ $videos }} {{ 100 - $videos }}"
+                                stroke-dashoffset="{{ -$photos }}"
+                                transform="rotate(-90 55 55)"/>
+
+                            {{-- Center text --}}
+                            <text x="55" y="52" text-anchor="middle" fill="#f0f0f0" font-size="13" font-weight="800" font-family="Inter,sans-serif">
+                                {{ $data['contentBreakDown']['total'] }}
+                            </text>
+
+                            <text x="55" y="66" text-anchor="middle" fill="#5a5e6b" font-size="9" font-family="Inter,sans-serif">
+                                posts this month
+                            </text>
+
                         </svg>
+
                         <div class="donut-legend">
-                            <div class="legend-row"><div class="legend-dot" style="background:var(--accent)"></div><span class="legend-label">Photos</span><span class="legend-val">52%</span></div>
-                            <div class="legend-row"><div class="legend-dot" style="background:var(--accent2)"></div><span class="legend-label">Videos</span><span class="legend-val">28%</span></div>
+                            <div class="legend-row">
+                                <div class="legend-dot" style="background:var(--accent)"></div>
+                                <span class="legend-label">Photos</span>
+                                <span class="legend-val">{{ $photos }}%</span>
+                            </div>
+
+                            <div class="legend-row">
+                                <div class="legend-dot" style="background:var(--accent2)"></div>
+                                <span class="legend-label">Videos</span>
+                                <span class="legend-val">{{ $videos }}%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -125,7 +166,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        @forelse($recentUsers as $recentUser)
+                        @forelse($data['recentUsers'] as $recentUser)
                             <tr>
                                 <td><div class="cell-user"> <img src="{{ asset('users/avatar/' . $recentUser->avatar) }}" class="sidebar-avatar" alt="{{$recentUser->username }} avatar"><div><div class="cell-name">
                                     {{$recentUser->username}}</div><div class="cell-handle">@ {{$recentUser->username}}</div></div></div></td>

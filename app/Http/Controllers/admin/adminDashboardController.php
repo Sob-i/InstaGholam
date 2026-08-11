@@ -6,24 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\posts\postModel;
 use App\Models\reports\reportModel;
 use App\Models\User;
+use App\Services\adminServices\adminDashboardServices\adminDashboardServices;
 use App\Services\reportServices\reportServices;
 use Illuminate\Http\Request;
 
 class adminDashboardController extends Controller
 {
-    public function __construct(protected reportServices $reportServices)
+    public function __construct(protected reportServices $reportServices , protected adminDashboardServices $adminDashboardServices)
     {
 
     }
     public function showDashboard()
     {
         $user = auth()->user();
-        $TotalUsers = User::all()->count();
-        $todayPosts = postModel::where('created_at',today())->count();
-        $recentUsers = User::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->whereIn('role', ['user' , 'verifiedUser'])->take(5)->get();
-        $openReportsCount = reportModel::where('status', 'pending')->count();
-        $suspendedUserCount = User::where('status', 'suspend')->count();
-        return view('admin.dashboard.dashboard', compact('user', 'TotalUsers', 'todayPosts', 'recentUsers', 'openReportsCount', 'suspendedUserCount'));
+        $data = $this->adminDashboardServices->DashboardData();
+        return view('admin.dashboard.dashboard', compact('user', 'data'));
     }
     public function showUsers()
     {
