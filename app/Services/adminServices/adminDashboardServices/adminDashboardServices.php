@@ -102,4 +102,81 @@ class adminDashboardServices
             'photos' => $photoPercent,
         ];
     }
+    public function ShowUsers()
+    {
+        $users = User::where('role','user')->orderby('created_at', 'desc')->paginate(10);
+        $totalUsers = $users->count();
+        $activeUser = $users->filter(function ($user) {
+            return $user->status == 'active';
+        })->count();
+        $suspendedUsers = $users->filter(function ($user) {
+            return $user->status == 'suspend';
+        })->count();
+        $bannedUsers = $users->filter(function ($user) {
+            return $user->status == 'banned';
+        })->count();
+        return [
+            'users' => $users,
+            'totalUsers' => $totalUsers,
+            'activeUser' => $activeUser,
+            'suspendedUsers' => $suspendedUsers,
+            'bannedUsers' => $bannedUsers,
+        ];
+    }
+    public function ShowPosts()
+    {
+        $posts = postModel::take(24)->latest()->with('user')->get();
+        $postsCount = $this->numberFormat($posts->count());
+        $todayPosts = $this->numberFormat($posts->filter(function ($post) {
+            return $post->created_at->isToday();
+        })->count());
+        $flaggedPosts = $this->numberFormat($posts->filter(function ($post) {
+            return $post->status == 'flagged';
+        })->count());
+        $hiddenPosts = $this->numberFormat($posts->filter(function ($post) {
+            return $post->status == 'hidden';
+        })->count());
+        $posts->transform(function ($post) {
+            $post->likes_formatted = $this->numberFormat($post->post_likes);
+            $post->comments_formatted = $this->numberFormat($post->post_comments);
+            return $post;
+        });
+        return [
+            'posts' => $posts,
+            'postsCount' => $postsCount,
+            'todayPosts' => $todayPosts,
+            'flaggedPosts' => $flaggedPosts,
+            'hiddenPosts' => $hiddenPosts,
+        ];
+    }
+    public function ShowFlaggedPosts()
+    {
+        $posts = postModel::with('user')->where('status', 'flagged')->orderBy('created_at', 'desc')->get();
+        $posts->transform(function ($post) {
+            $post->likes_formatted = $this->numberFormat($post->post_likes);
+            $post->comments_formatted = $this->numberFormat($post->post_comments);
+            return $post;
+        });
+        return response()->json($posts);
+    }
+    public function ShowHiddenPosts()
+    {
+        $posts = postModel::with('user')->where('status', 'hidden')->orderBy('created_at', 'desc')->get();
+        $posts->transform(function ($post) {
+            $post->likes_formatted = $this->numberFormat($post->post_likes);
+            $post->comments_formatted = $this->numberFormat($post->post_comments);
+            return $post;
+        });
+        return response()->json($posts);
+    }
+    private function numberFormat($number)
+    {
+        if ($number >= 1000000) {
+            return round($number / 1000000, 1) . 'M';
+        }
+        if ($number >= 1000) {
+            return round($number / 1000, 1) . 'k';
+        }
+        return $number;
+    }
 }

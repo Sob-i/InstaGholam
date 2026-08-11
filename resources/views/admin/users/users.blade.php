@@ -13,10 +13,10 @@
         <div class="content">
             <!-- Mini stats -->
             <div class="mini-stats">
-                <div class="mini-stat"><div class="mini-stat-val">{{number_format($totalUsers)}}</div><div class="mini-stat-label">Total users</div></div>
-                <div class="mini-stat"><div class="mini-stat-val" style="color:var(--green)">{{number_format($activeUser)}}</div><div class="mini-stat-label">Active</div></div>
-                <div class="mini-stat"><div class="mini-stat-val" style="color:var(--amber)">{{number_format($suspendedUsers)}}</div><div class="mini-stat-label">Suspended</div></div>
-                <div class="mini-stat"><div class="mini-stat-val" style="color:var(--red)">{{number_format($bannedUsers)}}</div><div class="mini-stat-label">Banned</div></div>
+                <div class="mini-stat"><div class="mini-stat-val">{{number_format($data['totalUsers'])}}</div><div class="mini-stat-label">Total users</div></div>
+                <div class="mini-stat"><div class="mini-stat-val" style="color:var(--green)">{{number_format($data['activeUser'])}}</div><div class="mini-stat-label">Active</div></div>
+                <div class="mini-stat"><div class="mini-stat-val" style="color:var(--amber)">{{number_format($data['suspendedUsers'])}}</div><div class="mini-stat-label">Suspended</div></div>
+                <div class="mini-stat"><div class="mini-stat-val" style="color:var(--red)">{{number_format($data['bannedUsers'])}}</div><div class="mini-stat-label">Banned</div></div>
             </div>
 
             <!-- Filters -->
@@ -35,7 +35,6 @@
                     <option>All roles</option>
                     <option>User</option>
                     <option>Verified</option>
-                    <option>Admin</option>
                 </select>
                 <select>
                     <option>Sort: Newest</option>
@@ -60,7 +59,7 @@
             <div class="card">
                 <div class="card-head">
                     <span class="card-title">All Users</span>
-                    <span class="result-count">{{number_format($totalUsers)}} results</span>
+                    <span class="result-count">{{number_format($data['totalUsers'])}} results</span>
                 </div>
                 <table>
                     <thead>
@@ -77,7 +76,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @forelse($users as $user)
+                    @forelse($data['users'] as $user)
                         <tr>
                             <td><input type="checkbox" value="{{$user->id}}" data-user-id="{{$user->id}}"/></td>
                             <td><div class="cell-user">

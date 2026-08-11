@@ -17,10 +17,10 @@
 
         <div class="content">
             <div class="mini-stats">
-                <div class="mini-stat"><div class="mini-stat-val">{{$postsCount}}</div><div class="mini-stat-label">Total posts</div></div>
-                <div class="mini-stat"><div class="mini-stat-val">{{$todayPosts}}</div><div class="mini-stat-label">Posted today</div></div>
-                <div class="mini-stat"><div id="flagged-mini-stat-value" class="mini-stat-val" style="color:var(--red)">{{$flaggedPosts}}</div><div class="mini-stat-label">Flagged</div></div>
-                <div class="mini-stat"><div class="mini-stat-val" style="color:var(--amber)">{{$hiddenPosts}}</div><div class="mini-stat-label">Hidden</div></div>
+                <div class="mini-stat"><div class="mini-stat-val">{{$data['postsCount']}}</div><div class="mini-stat-label">Total posts</div></div>
+                <div class="mini-stat"><div class="mini-stat-val">{{$data['todayPosts']}}</div><div class="mini-stat-label">Posted today</div></div>
+                <div class="mini-stat"><div id="flagged-mini-stat-value" class="mini-stat-val" style="color:var(--red)">{{$data['flaggedPosts']}}</div><div class="mini-stat-label">Flagged</div></div>
+                <div class="mini-stat"><div class="mini-stat-val" style="color:var(--amber)">{{$data['hiddenPosts']}}</div><div class="mini-stat-label">Hidden</div></div>
             </div>
 
             <div class="filters-row">
@@ -33,7 +33,7 @@
             </div>
 
             <div class="posts-grid" id="postsGrid">
-                @foreach($posts as $post)
+                @foreach($data['posts'] as $post)
                     @php
                         $firstFile = strtok($post->post_files, ',');
                         $fileExtension = strtolower(pathinfo($firstFile, PATHINFO_EXTENSION));
