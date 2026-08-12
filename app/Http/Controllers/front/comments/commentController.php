@@ -25,4 +25,12 @@ class commentController extends Controller
         ];
        return $this->postServices->AddComment($data);
     }
+    public function deleteComment($PostId , $commentId)
+    {
+        $data = [
+            'comment_id' => $commentId,
+            'post_id' => $PostId,
+        ];
+        return $this->postServices->DeleteComment($data);
+    }
 }

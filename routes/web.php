@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
         // Post
         Route::get('post/{id}', [postController::class, 'showPost'])->name('post.show');
         Route::post('post/{id}/comments', [commentController::class, 'sendComment'])->name('post.comment.send');
+        Route::post('post/{id}/comment/{commentId}/delete', [commentController::class, 'deleteComment'])->name('post.comment.delete');
         Route::post('/post/{post}/like', [postsLikeController::class, 'toggle'])->name('post.like');
         Route::post('/post/{post}/save', [postsSaveController::class, 'toggle'])->name('post.save');
 
@@ -99,9 +100,6 @@ Route::middleware('auth')->group(function () {
         // Users
         Route::get('users', [adminDashboardController::class, 'showUsers'])->name('admin.users');
         Route::put('users/{id}/statusChange/{status}', [usersDashboardController::class, 'changeStatus'])->name('admin.users.status.change');
-        Route::put('users/{id}/statusToActive', [usersDashboardController::class, 'userStatusToActive'])->name('admin.users.status.active');
-        Route::put('users/{id}/statusToSuspended', [usersDashboardController::class, 'userStatusToSuspended'])->name('admin.users.status.suspended');
-        Route::put('users/{id}/statusToBanned', [usersDashboardController::class, 'userStatusToBanned'])->name('admin.users.status.banned');
 
         // Posts
         Route::get('posts', [adminDashboardController::class, 'showPosts'])->name('admin.posts');

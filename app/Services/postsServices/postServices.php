@@ -223,6 +223,40 @@ class postServices
             'success' => false,
         ]);
     }
+    public function DeleteComment($data)
+    {
+        $comment = commentModel::where('post_id', $data['post_id'])
+            ->where('id', $data['comment_id'])
+            ->first();
+
+        $post = postModel::find($data['post_id']);
+
+        if (
+            auth()->id() == $comment->user_id ||
+            auth()->id() == $post->user_id
+        ) {
+            $DeletedComment = $comment->delete();
+
+            if ($DeletedComment) {
+
+                $post->decrement('post_comments');
+
+                return response()->json([
+                    'success' => true,
+                    'commentCount' => -1,
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'You cannot delete this comment.',
+        ], 403);
+    }
     public function LikePost($user , $post)
     {
         try {

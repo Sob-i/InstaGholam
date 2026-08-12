@@ -709,3 +709,9 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
     cursor:pointer;
     border-radius:6px;
 }
+
+.verified-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: -8px;
+}

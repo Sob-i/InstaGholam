@@ -227,13 +227,19 @@
                         </button>
                     @endif
 
-                    <button class="action-btn">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                             viewBox="0 0 24 24">
-                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                        </svg>
-                        {{$post->post_comments}}
-                    </button>
+                        <button
+                            class="action-btn comments-count"
+                            data-post-id="{{ $post->id }}"
+                        >
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                                 viewBox="0 0 24 24">
+                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                            </svg>
+
+                            <span class="comment-count-number">
+                                        {{ $post->post_comments }}
+                                    </span>
+                        </button>
                     <button class="action-btn">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                              viewBox="0 0 24 24">
@@ -272,13 +278,51 @@
                             @if(isset($postWithInfo['comments']) && count($postWithInfo['comments']) > 0)
                                 @foreach($postWithInfo['comments'] as $comment)
                                     <div class="comment-item">
-                                        <img src="{{asset('users/avatar/'.$comment->user->avatar)}}"
-                                             class="comment-avatar"
-                                             alt="{{ $comment->user->username }}">
+                                        <a href="{{route('profile',$comment->user->username)}}">
+                                            <img src="{{ asset('users/avatar/'.$comment->user->avatar) }}"
+                                                 class="comment-avatar"
+                                                 alt="{{ $comment->user->username }}">
+                                        </a>
                                         <div class="comment-content">
-                                            <strong class="comment-username">{{ $comment->user->username ?? 'Unknown' }}</strong>
+                                            <a href="{{route('profile',$comment->user->username)}}" style="text-decoration: none">
+                                                <strong class="comment-username">{{ $comment->user->username ?? 'Unknown' }}</strong>
+                                                @if($comment->user->role == 'admin' || $comment->user->role == 'verifiedUser')
+                                                    <svg class="verified-icon" width="14" height="14" fill="var(--accent)" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                @endif
+                                            </a>
                                             <span class="comment-text">{{ $comment->content }}</span>
                                             <span class="post-time" style="color: #8e8e8e; font-size: 10px; margin-right: 8px; direction: ltr; display: inline-block;">{{ $comment->created_at->diffForHumans() }}</span>
+                                        </div>
+                                        <!-- Three-dot menu button -->
+                                        <div class="dropdown-wrapper">
+                                            <button class="btn-three-dot" onclick="toggleDropdown(event)">
+                                                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
+                                                    <circle cx="12" cy="5" r="2"/>
+                                                    <circle cx="12" cy="12" r="2"/>
+                                                    <circle cx="12" cy="19" r="2"/>
+                                                </svg>
+                                            </button>
+
+                                            <div class="dropdown-menu">
+                                                  <span
+                                                      class="dropdown-item report-btn"
+                                                      data-id="{{ $comment->id }}"
+                                                      data-type="comment"
+                                                      data-uid="{{$comment->user_id}}">
+                                                        Report
+                                                  </span>
+                                                @if(auth()->id() == $comment->user_id || auth()->id() == $post->user_id)
+                                                    <span
+                                                        class="dropdown-item delete-comment"
+                                                        data-id="{{ $comment->id }}"
+                                                        data-uid="{{ $comment->user_id }}"
+                                                        data-post-id="{{ $post->id }}"
+                                                        data-post-uid="{{ $post->user_id }}"
+                                                    >
+                                                        Delete
+                                                    </span>
+                                                @endif
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach
