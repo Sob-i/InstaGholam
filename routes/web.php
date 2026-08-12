@@ -108,12 +108,10 @@ Route::middleware('auth')->group(function () {
         Route::get('postsFlagged', [adminDashboardController::class, 'showPostsFlagged'])->name('admin.posts.flagged');
 
         Route::get('posts/search', [postsDashboardController::class, 'search'])->name('admin.posts.search');
-        Route::get('posts/searchFlagged', [postsDashboardController::class, 'searchInFlagged'])->name('admin.posts.search.flagged');
-        Route::get('posts/searchHidden', [postsDashboardController::class, 'searchInHidden'])->name('admin.posts.search.hidden');
+        Route::get('posts/searchFlagged', [postsDashboardController::class, 'search'])->name('admin.posts.search.flagged');
+        Route::get('posts/searchHidden', [postsDashboardController::class, 'search'])->name('admin.posts.search.hidden');
 
-        Route::put('posts/statusToActive/{id}', [postsDashboardController::class, 'postStatusToActive'])->name('admin.posts.status.to.active');
-        Route::put('posts/statusToFlagged/{id}', [postsDashboardController::class, 'postStatusToFlagged'])->name('admin.posts.status.to.flagged');
-        Route::put('posts/statusToHidden/{id}', [postsDashboardController::class, 'postStatusToHidden'])->name('admin.posts.status.to.hidden');
+        Route::put('posts/statusChange/{id}/{status}', [postsDashboardController::class, 'postStatusChange'])->name('admin.posts.status.change');
 
         // Reports
         Route::get('reports', [adminDashboardController::class, 'showReports'])->name('admin.reports');

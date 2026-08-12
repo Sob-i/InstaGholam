@@ -275,7 +275,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function approveHandler(postId) {
 
-    fetch(`/admin/posts/statusToActive/${postId}`, {
+    fetch(`/admin/posts/statusChange/${postId}/active`, {
         method: "PUT",
         headers: {
             "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,

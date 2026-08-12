@@ -50,7 +50,7 @@ async function flagHandler(dataPostId) {
 
     try {
 
-        const res = await fetch(`/admin/posts/statusToFlagged/${dataPostId}`, {
+        const res = await fetch(`/admin/posts/statusChange/${dataPostId}/flagged`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
