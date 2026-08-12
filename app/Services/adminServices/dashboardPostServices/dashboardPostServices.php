@@ -48,13 +48,13 @@ class dashboardPostServices
     public function ChangePostStatus(array $data)
     {
         $affectedPost = postModel::where('id', $data['id'])->update(['status' => $data['status']]);
-
+        $status = $data['status'];
         if ($affectedPost) {
-            $flaggedCount = +1;
+            $Count = +1;
             return response()->json([
                 'success' => true,
-                'message' => 'Flagged post successfully',
-                'flaggedPostCount' => $flaggedCount,
+                'message' => "$status post successfully",
+                $status.'PostCount' => $Count,
             ]);
         }
         return response()->json([

@@ -553,8 +553,12 @@
                 if (buttonElement) {
                     buttonElement.style.opacity = '0.5';
                     buttonElement.style.pointerEvents = 'none';
+
                     const originalText = buttonElement.textContent.trim();
-                    buttonElement.innerHTML = '<span class="loading-spinner"></span> Processing...';
+
+                    buttonElement.innerHTML =
+                        '<span class="loading-spinner"></span> Processing...';
+
                     buttonElement.dataset.originalText = originalText;
                 }
 
@@ -569,36 +573,52 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
+
                             let successMessage = '';
-                            switch(action) {
+
+                            switch (action) {
                                 case 'Suspend':
                                     successMessage = '✓ User has been suspended successfully';
                                     break;
+
                                 case 'Ban':
                                     successMessage = '✓ User has been banned successfully';
                                     break;
+
                                 case 'Restore':
                                     successMessage = '✓ User has been restored successfully';
                                     break;
+
                                 default:
                                     successMessage = '✓ ' + data.message;
                             }
 
                             showToast(successMessage, 'success');
+
                             updateUserRowUI(userId, action);
 
                         } else {
-                            showToast('✗ ' + (data.message || 'Something went wrong. Please try again.'), 'error');
+
+                            showToast(
+                                '✗ ' + (data.message || 'Something went wrong. Please try again.'),
+                                'error'
+                            );
+
                             resetButton(buttonElement);
                         }
                     })
                     .catch(error => {
+
                         console.error('Error:', error);
-                        showToast('✗ An error occurred. Please try again.', 'error');
+
+                        showToast(
+                            '✗ An error occurred. Please try again.',
+                            'error'
+                        );
+
                         resetButton(buttonElement);
                     });
             }
-
             // Function to update the user row UI dynamically
             function updateUserRowUI(userId, action) {
                 const row = document.querySelector(`input[data-user-id="${userId}"]`)?.closest('tr');
@@ -735,51 +755,150 @@
 
             // Function to attach event listeners to buttons
             function attachButtonListeners() {
-                // Handle all buttons
+
                 document.querySelectorAll('.act-btn').forEach(button => {
+
                     // Skip View buttons and already processed buttons
-                    if (button.classList.contains('primary') || button.dataset.listenerAttached === 'true') {
+                    if (
+                        button.classList.contains('primary') ||
+                        button.dataset.listenerAttached === 'true'
+                    ) {
                         return;
                     }
 
                     button.dataset.listenerAttached = 'true';
 
                     button.addEventListener('click', function(e) {
+
                         e.preventDefault();
+
                         const row = this.closest('tr');
-                        const userId = row.querySelector('input[type="checkbox"]')?.dataset.userId;
-                        const userName = row.querySelector('.cell-name')?.textContent.trim() || 'this user';
+
+                        const userId = row
+                            .querySelector('input[type="checkbox"]')
+                            ?.dataset.userId;
+
+                        const userName = row
+                            .querySelector('.cell-name')
+                            ?.textContent
+                            .trim() || 'this user';
 
                         if (!userId) return;
 
                         const actionText = this.textContent.trim();
 
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Suspend
+                        |--------------------------------------------------------------------------
+                        */
+
                         if (actionText === 'Suspend') {
-                            const message = `<span style="color: #f59e0b; font-weight: 600;">${userName}</span> will be <span style="color: #f59e0b; font-weight: 600;">suspended</span> and lose access to their account until restored.`;
+
+                            const message = `
+                    <span style="color: #f59e0b; font-weight: 600;">
+                        ${userName}
+                    </span>
+                    will be
+                    <span style="color: #f59e0b; font-weight: 600;">
+                        suspended
+                    </span>
+                    and lose access to their account until restored.
+                `;
 
                             showModal(message, 'Suspend', () => {
-                                const route = `/admin/users/${userId}/statusToSuspended`;
-                                updateUserStatus(route, userId, 'Suspend', this);
+
+                                const route =
+                                    `/admin/users/${userId}/statusChange/suspend`;
+
+                                updateUserStatus(
+                                    route,
+                                    userId,
+                                    'Suspend',
+                                    this
+                                );
                             });
                         }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Restore
+                        |--------------------------------------------------------------------------
+                        */
+
                         else if (actionText === 'Restore') {
-                            const message = `<span style="color: #10b981; font-weight: 600;">${userName}</span> will be <span style="color: #10b981; font-weight: 600;">restored</span> and regain full access to their account.`;
+
+                            const message = `
+                    <span style="color: #10b981; font-weight: 600;">
+                        ${userName}
+                    </span>
+                    will be
+                    <span style="color: #10b981; font-weight: 600;">
+                        restored
+                    </span>
+                    and regain full access to their account.
+                `;
 
                             showModal(message, 'Restore', () => {
-                                const route = `/admin/users/${userId}/statusToActive`;
-                                updateUserStatus(route, userId, 'Restore', this);
+
+                                const route =
+                                    `/admin/users/${userId}/statusChange/active`;
+
+                                updateUserStatus(
+                                    route,
+                                    userId,
+                                    'Restore',
+                                    this
+                                );
                             });
                         }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Ban
+                        |--------------------------------------------------------------------------
+                        */
+
                         else if (actionText === 'Ban') {
-                            const message = `<span style="color: #ef4444; font-weight: 600;">${userName}</span> will be <span style="color: #ef4444; font-weight: 600;">permanently banned</span>. This action is severe and should only be used for users violating terms of service.`;
+
+                            const message = `
+                    <span style="color: #ef4444; font-weight: 600;">
+                        ${userName}
+                    </span>
+                    will be
+                    <span style="color: #ef4444; font-weight: 600;">
+                        permanently banned
+                    </span>.
+                    This action is severe and should only be used for users
+                    violating terms of service.
+                `;
 
                             showModal(message, 'Ban', () => {
-                                const route = `/admin/users/${userId}/statusToBanned`;
-                                updateUserStatus(route, userId, 'Ban', this);
+
+                                const route =
+                                    `/admin/users/${userId}/statusChange/banned`;
+
+                                updateUserStatus(
+                                    route,
+                                    userId,
+                                    'Ban',
+                                    this
+                                );
                             });
                         }
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | Email
+                        |--------------------------------------------------------------------------
+                        */
+
                         else if (actionText === 'Email') {
-                            showToast('Email functionality coming soon!', 'success');
+
+                            showToast(
+                                'Email functionality coming soon!',
+                                'success'
+                            );
                         }
                     });
                 });

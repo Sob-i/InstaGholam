@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
 
         // Users
         Route::get('users', [adminDashboardController::class, 'showUsers'])->name('admin.users');
+        Route::put('users/{id}/statusChange/{status}', [usersDashboardController::class, 'changeStatus'])->name('admin.users.status.change');
         Route::put('users/{id}/statusToActive', [usersDashboardController::class, 'userStatusToActive'])->name('admin.users.status.active');
         Route::put('users/{id}/statusToSuspended', [usersDashboardController::class, 'userStatusToSuspended'])->name('admin.users.status.suspended');
         Route::put('users/{id}/statusToBanned', [usersDashboardController::class, 'userStatusToBanned'])->name('admin.users.status.banned');

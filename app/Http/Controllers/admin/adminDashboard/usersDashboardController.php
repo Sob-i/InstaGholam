@@ -4,63 +4,22 @@ namespace App\Http\Controllers\admin\adminDashboard;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\adminServices\dashboardUsersServices\dashboardUsersServices;
 use Illuminate\Http\Request;
 use Symfony\Component\Console\Tests\Fixtures\UserStatus;
 
 class usersDashboardController extends Controller
 {
-    public function userStatusToSuspended($userId)
+    public function __construct(protected dashboardUsersServices $dashboardUsersServices)
     {
-        $updatedUser = User::where('id', $userId)->update([
-            'status' => 'suspend',
-        ]);
-        $suspendedCount =+ 1;
-        if ($updatedUser) {
-            return response([
-                'status' => 'success',
-                'message' => 'User is suspended successfully',
-                'suspendedCount' => $suspendedCount,
-            ]);
-        }
-        return response([
-            'status' => 'error',
-            'message' => 'something went wrong',
-        ]);
+
     }
-    public function userStatusToBanned($userId)
+    public function changeStatus($userId , $status)
     {
-        $updatedUser = User::where('id', $userId)->update([
-            'status' => 'banned',
-        ]);
-        $bannedCount =+ 1;
-        if ($updatedUser) {
-            return response([
-                'status' => 'success',
-                'message' => 'User is banned successfully',
-                'suspendedCount' => $bannedCount,
-            ]);
-        }
-        return response([
-            'status' => 'error',
-            'message' => 'something went wrong',
-        ]);
-    }
-    public function userStatusToActive($userId)
-    {
-        $updatedUser = User::where('id', $userId)->update([
-            'status' => 'active',
-        ]);
-        $activeCount =+ 1;
-        if ($updatedUser) {
-            return response([
-                'status' => 'success',
-                'message' => 'User is active successfully',
-                'suspendedCount' => $activeCount,
-            ]);
-        }
-        return response([
-            'status' => 'error',
-            'message' => 'something went wrong',
-        ]);
+        $data = [
+            'id' => $userId,
+            'status' => $status
+        ];
+        return $this->dashboardUsersServices->ChangeUserStatus($data);
     }
 }
