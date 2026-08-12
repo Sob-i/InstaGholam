@@ -30,13 +30,24 @@
                         </button>
 
                         <div class="dropdown-menu">
-                                  <span
-                                      class="dropdown-item report-btn"
-                                      data-id="{{ $post->id }}"
-                                      data-type="post"
-                                      data-uid="{{$post->user_id}}">
+                            @if(auth()->id() != $post->user_id)
+                                <span
+                                    class="dropdown-item report-btn"
+                                    data-id="{{ $post->id }}"
+                                    data-type="post"
+                                    data-uid="{{$post->user_id}}">
                                         Report
-                                  </span>
+                                         </span>
+                            @endif
+                                @if(auth()->id() == $post->user_id)
+                                    <span
+                                        class="dropdown-item report-btn"
+                                        data-id="{{ $post->id }}"
+                                        data-type="post"
+                                        data-uid="{{$post->user_id}}">
+                                        Delete
+                                         </span>
+                                @endif
                         </div>
                     </div>
 
@@ -304,13 +315,16 @@
                                             </button>
 
                                             <div class="dropdown-menu">
-                                                  <span
-                                                      class="dropdown-item report-btn"
-                                                      data-id="{{ $comment->id }}"
-                                                      data-type="comment"
-                                                      data-uid="{{$comment->user_id}}">
+                                                @if(auth()->id() != $comment->user_id)
+                                                    <span
+                                                        class="dropdown-item report-btn"
+                                                        data-id="{{ $comment->id }}"
+                                                        data-type="comment"
+                                                        data-uid="{{$comment->user_id}}">
                                                         Report
                                                   </span>
+                                                @endif
+
                                                 @if(auth()->id() == $comment->user_id || auth()->id() == $post->user_id)
                                                     <span
                                                         class="dropdown-item delete-comment"
