@@ -59,16 +59,7 @@ class adminDashboardServices
     }
     private function NewOpenReportsCount()
     {
-        $todayReports = reportModel::where('status','pending')->whereDate('created_at', today())->count();
-        $yesterdayReports = reportModel::where('status','pending')->whereDate('created_at', today()->subDay())->count();
-        if ($yesterdayReports == 0 && $todayReports > 0) {
-            return 1;
-        }
-
-        if ($yesterdayReports == 0) {
-            return 0;
-        }
-        return $yesterdayReports > 0 ? $yesterdayReports - $todayReports : 0;
+        return reportModel::where('status','pending')->whereDate('created_at', today())->count();
     }
     private function SuspendedUserCount()
     {
