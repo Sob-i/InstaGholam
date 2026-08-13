@@ -24,4 +24,9 @@ class commentModel extends Model
         public function post(){
            return $this->belongsTo(postModel::class, 'post_id','id');
         }
+
+        public function replies()
+        {
+            return $this->hasMany(commentModel::class, 'reply_comment_id', 'id')->where('type', 'reply');
+        }
 }

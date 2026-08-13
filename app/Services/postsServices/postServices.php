@@ -46,17 +46,11 @@ class postServices
             $isFollowed = true;
         }
 
-        $comments = CommentModel::where('post_id', $post->id)
-            ->with('user')
-            ->orderBy('created_at', 'desc')
-            ->get();
-
         $postFiles = explode(',', $post->post_files);
         $date = $post->created_at->format('Y-m-d');
         $folderName = strstr($post->user->email, '@', true);
 
         return [
-            'comments' => $comments ,
             'postFiles' => $postFiles ,
             'date' => $date ,
             'folderName' => $folderName ,
@@ -104,9 +98,6 @@ class postServices
         $posts = postModel::whereIn('user_id', $followingIds)->where('status', 'active')
             ->with([
                 'user',
-                'comments' => function ($query) {
-                    $query->with('user')->orderBy('created_at', 'desc');
-                }
             ])
             ->orderByDesc('created_at')
             ->paginate(20);
@@ -197,16 +188,40 @@ class postServices
     }
     public function GetComments($postId)
     {
-        $comments = commentModel::where('post_id', $postId)->where('type','comment')->orderBy('created_at', 'desc')->with('user:id,username,avatar')->paginate(15);
-        if ($comments->isNotEmpty()) {
-            return response()->json([
-                'status' => true,
-                'data' => $comments
-            ]);
-        }
+        $comments = commentModel::where('post_id', $postId)
+            ->where('type', 'comment')
+            ->orderBy('created_at', 'desc')
+            ->with([
+                'user:id,username,avatar,role',
+                'post:id,user_id'
+            ])
+            ->withCount([
+                'replies as replies_count'
+            ])
+            ->paginate(15);
+
+        $commentsData = $comments->getCollection()->map(function ($comment) {
+
+            $data = $comment->toArray();
+
+            $data['created_at'] = $comment->created_at->diffForHumans();
+
+            $data['can_report'] = auth()->id() != $comment->user_id;
+
+            $data['can_delete'] =
+                auth()->id() == $comment->user_id ||
+                auth()->id() == $comment->post->user_id;
+
+            return $data;
+        });
+
         return response()->json([
-            'status' => false,
-            'message' => 'No comments yet.'
+            'status' => true,
+            'comments' => $commentsData,
+            'current_page' => $comments->currentPage(),
+            'last_page' => $comments->lastPage(),
+            'has_more' => $comments->hasMorePages(),
+            'total' => $comments->total(),
         ]);
     }
     public function AddComment($data)
@@ -237,6 +252,33 @@ class postServices
             'success' => false,
         ]);
     }
+    public function GetCommentReplies($postId, $commentId)
+    {
+        $replies = commentModel::where('post_id', $postId)
+            ->where('reply_comment_id', $commentId)
+            ->where('type', 'reply')
+            ->orderBy('created_at', 'asc')
+            ->with('user:id,username,avatar,role')
+            ->paginate(15);
+
+        $repliesData = $replies->getCollection()->map(function ($reply) {
+
+            $data = $reply->toArray();
+
+            $data['created_at'] = $reply->created_at->diffForHumans();
+
+            return $data;
+        });
+
+        return response()->json([
+            'status' => true,
+            'replies' => $repliesData,
+            'current_page' => $replies->currentPage(),
+            'last_page' => $replies->lastPage(),
+            'has_more' => $replies->hasMorePages(),
+            'total' => $replies->total(),
+        ]);
+    }
     public function AddCommentReply($data)
     {
         $commentReply = commentModel::create([
@@ -253,11 +295,14 @@ class postServices
             return response()->json([
                 'success' => true,
                 'reply' => [
+                    'id' => $commentReply->id,
                     'content' => $commentReply->content,
                     'created_at' => $commentReply->created_at->diffForHumans(),
                     'user' => [
+                        'id' => $commentReply->user->id,
                         'name' => $commentReply->user->username,
                         'avatar' => $commentReply->user->avatar,
+                        'role' => $commentReply->user->role,
                     ]
                 ]
             ]);

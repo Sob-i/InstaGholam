@@ -40,6 +40,10 @@ class commentController extends Controller
         ];
        return $this->postServices->AddCommentReply($data);
     }
+    public function getCommentReplies($postId , $commentId)
+    {
+        return $this->postServices->GetCommentReplies($postId , $commentId);
+    }
     public function deleteComment($PostId , $commentId)
     {
         $data = [

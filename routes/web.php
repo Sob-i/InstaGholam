@@ -50,7 +50,8 @@ Route::middleware('auth')->group(function () {
         Route::get('post/{id}', [postController::class, 'showPost'])->name('post.show');
         Route::post('post/{id}/sendComment', [commentController::class, 'sendComment'])->name('post.comment.send');
         Route::get('post/{id}/comments', [commentController::class, 'getComments'])->name('post.comments.get');
-        Route::post('post/{potId}/{commentId}/sendCommentReply', [commentController::class, 'sendCommentReply'])->name('post.comment.reply.send');
+        Route::post('post/{postId}/{commentId}/sendCommentReply', [commentController::class, 'sendCommentReply'])->name('post.comment.reply.send');
+        Route::get('post/{postId}/comment/{commentId}/replies', [commentController::class, 'getCommentReplies'])->name('post.comment.replies.get');
         Route::post('post/{id}/comment/{commentId}/delete', [commentController::class, 'deleteComment'])->name('post.comment.delete');
         Route::post('/post/{post}/like', [postsLikeController::class, 'toggle'])->name('post.like');
         Route::post('/post/{post}/save', [postsSaveController::class, 'toggle'])->name('post.save');
