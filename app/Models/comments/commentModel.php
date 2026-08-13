@@ -12,7 +12,9 @@ class commentModel extends Model
         protected $fillable = [
             'user_id',
             'post_id',
-            'content'
+            'content',
+            'type',
+            'reply_comment_id',
         ];
 
         public function user(){

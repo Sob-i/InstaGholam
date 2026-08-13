@@ -17,7 +17,7 @@
         $button.prop('disabled', true).text('Posting...');
 
         $.ajax({
-            url: '/post/' + postId + '/comments',
+            url: '/post/' + postId + '/sendComment',
             method: 'POST',
             data: {
                 _token: $('meta[name="csrf-token"]').attr('content'),

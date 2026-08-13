@@ -195,6 +195,20 @@ class postServices
         $timestamp = date('Y-m-d',time());
         $file->move(public_path("users/posts/$folderName-posts/$timestamp"), $fileName);
     }
+    public function GetComments($postId)
+    {
+        $comments = commentModel::where('post_id', $postId)->where('type','comment')->orderBy('created_at', 'desc')->with('user:id,username,avatar')->paginate(15);
+        if ($comments->isNotEmpty()) {
+            return response()->json([
+                'status' => true,
+                'data' => $comments
+            ]);
+        }
+        return response()->json([
+            'status' => false,
+            'message' => 'No comments yet.'
+        ]);
+    }
     public function AddComment($data)
     {
         $comment = commentModel::create([
@@ -215,6 +229,35 @@ class postServices
                         'name' => $comment->user->username,
                         'avatar' => $comment->user->avatar,
                         ''
+                    ]
+                ]
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+        ]);
+    }
+    public function AddCommentReply($data)
+    {
+        $commentReply = commentModel::create([
+            'post_id' => $data['post_id'],
+            'user_id' => $data['user_id'],
+            'reply_comment_id' => $data['comment_id'],
+            'content' => $data['reply']['reply'],
+            'type' => $data['type'],
+        ]);
+
+        $commentReply->load('user');
+        if($commentReply){
+            postModel::where('id', $data['post_id'])->increment('post_comments');
+            return response()->json([
+                'success' => true,
+                'reply' => [
+                    'content' => $commentReply->content,
+                    'created_at' => $commentReply->created_at->diffForHumans(),
+                    'user' => [
+                        'name' => $commentReply->user->username,
+                        'avatar' => $commentReply->user->avatar,
                     ]
                 ]
             ]);
