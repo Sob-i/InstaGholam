@@ -40,7 +40,6 @@ class profileServices
         $Current = Auth::user();
         $owner = $user;
             $posts = PostModel::where('user_id', $user->id)->where('status','active')->with('comments')->orderBy('created_at', 'desc')->get();
-            $savedPosts  = postsSaveModel::where('user_id', $user->id)->with('post')->orderBy('created_at', 'desc')->get();
             $postsCount = $posts->count();
             $followersCount = $user->followers;
             $followingCount = $user->following;
@@ -67,7 +66,6 @@ class profileServices
             }
             return [
                 'posts' => $posts,
-                'savedPosts' => $savedPosts,
                 'postsCount' => $postsCount,
                 'followersCount' => $followersCount,
                 'followingCount' => $followingCount,
@@ -193,6 +191,18 @@ class profileServices
         }
 
         return $createdHighlights;
+    }
+    public function GetUserSavedPosts($userId)
+    {
+        $savedPosts = postsSaveModel::where('user_id', $userId)->with('post')->latest()->paginate(15);
+        return response()->json([
+            'status' => true,
+            'saved_posts' => $savedPosts->items(),
+            'current_page' => $savedPosts->currentPage(),
+            'last_page' => $savedPosts->lastPage(),
+            'has_more' => $savedPosts->hasMorePages(),
+            'total' => $savedPosts->total(),
+        ]);
     }
 
 }

@@ -186,6 +186,93 @@ class postServices
         $timestamp = date('Y-m-d',time());
         $file->move(public_path("users/posts/$folderName-posts/$timestamp"), $fileName);
     }
+    public function LikePost($user , $post)
+    {
+        try {
+            $existingLike = postsLikeModel::where('user_id', $user->id)
+                ->where('post_id', $post->id)
+                ->first();
+
+            if ($existingLike) {
+
+                $existingLike->delete();
+                $post->decrement('post_likes');
+                $isLiked = false;
+                $message = 'Post unliked successfully';
+
+            } else {
+
+                postsLikeModel::create([
+                    'user_id' => $user->id,
+                    'post_id' => $post->id
+                ]);
+                $post->increment('post_likes');
+                $isLiked = true;
+                $message = 'Post liked successfully';
+            }
+
+            if ($post->like_count == 'visible') {
+                $likesCount = $post->likes()->count();
+                $formattedCount = $this->formatCount($likesCount);
+                $showCount = true;
+            } else {
+                $likesCount = null;
+                $formattedCount = null;
+                $showCount = false;
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'is_liked' => $isLiked,
+                'likes_count' => $likesCount,
+                'formatted_count' => $formattedCount,
+                'show_count' => $showCount,
+                'animation' => $isLiked ? 'like' : 'unlike'
+            ]);
+
+
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred. Please try again.'
+            ], 500);
+        }
+    }
+    public function SavePost($user , $post)
+    {
+        try {
+            $existingSave = postsSaveModel::where('user_id',$user->id)->where('post_id',$post->id)->first();
+
+            if ($existingSave) {
+                $existingSave->delete();
+                $isSaved = false;
+                $message = 'Post unsaved successfully';
+            }else{
+                postsSaveModel::create([
+                    'user_id' => $user->id,
+                    'post_id' => $post->id
+                ]);
+                $isSaved = true;
+                $message = 'Post saved successfully';
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'is_saved' => $isSaved,
+                'animation' => $isSaved ? 'saved' : 'unsaved'
+            ]);
+
+
+        }catch (\Exception $e){
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred. Please try again.'
+            ], 500);
+        }
+    }
     public function GetComments($postId)
     {
         $comments = commentModel::where('post_id', $postId)
@@ -417,60 +504,6 @@ class postServices
 
         return $deletedCount;
     }
-    public function LikePost($user , $post)
-    {
-        try {
-            $existingLike = postsLikeModel::where('user_id', $user->id)
-                ->where('post_id', $post->id)
-                ->first();
-
-            if ($existingLike) {
-
-                $existingLike->delete();
-                $post->decrement('post_likes');
-                $isLiked = false;
-                $message = 'Post unliked successfully';
-
-            } else {
-
-                postsLikeModel::create([
-                    'user_id' => $user->id,
-                    'post_id' => $post->id
-                ]);
-                $post->increment('post_likes');
-                $isLiked = true;
-                $message = 'Post liked successfully';
-            }
-
-            if ($post->like_count == 'visible') {
-                $likesCount = $post->likes()->count();
-                $formattedCount = $this->formatCount($likesCount);
-                $showCount = true;
-            } else {
-                $likesCount = null;
-                $formattedCount = null;
-                $showCount = false;
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'is_liked' => $isLiked,
-                'likes_count' => $likesCount,
-                'formatted_count' => $formattedCount,
-                'show_count' => $showCount,
-                'animation' => $isLiked ? 'like' : 'unlike'
-            ]);
-
-
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred. Please try again.'
-            ], 500);
-        }
-    }
     private function formatCount($count)
     {
         if ($count >= 1000000) {
@@ -480,38 +513,6 @@ class postServices
         }
         return $count;
     }
-    public function SavePost($user , $post)
-    {
-        try {
-            $existingSave = postsSaveModel::where('user_id',$user->id)->where('post_id',$post->id)->first();
 
-            if ($existingSave) {
-                $existingSave->delete();
-                $isSaved = false;
-                $message = 'Post unsaved successfully';
-            }else{
-                postsSaveModel::create([
-                    'user_id' => $user->id,
-                    'post_id' => $post->id
-                ]);
-                $isSaved = true;
-                $message = 'Post saved successfully';
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'is_saved' => $isSaved,
-                'animation' => $isSaved ? 'saved' : 'unsaved'
-            ]);
-
-
-        }catch (\Exception $e){
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred. Please try again.'
-            ], 500);
-        }
-    }
 
 }

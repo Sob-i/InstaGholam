@@ -75,6 +75,7 @@ Route::middleware('auth')->group(function () {
 
         // Profile
         Route::get('profile/{username}', [frontController::class, 'profile'])->name('profile');
+        Route::get('profile/{username}/showSavedPosts', [profileController::class, 'showSavedPosts'])->name('profile.posts.saved.show');
         Route::get('profile/{username}/edit', [profileController::class, 'showEditProfile'])->name('profile.edit.show');
         Route::put('profile/{username}/edit', [profileController::class, 'editProfile'])->name('profile.edit');
         Route::get('profile/{username}/edit/password', [profileController::class, 'showEditPassword'])->name('profile.edit.password.show');

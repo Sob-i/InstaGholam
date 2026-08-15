@@ -238,19 +238,22 @@
                         </button>
                     @endif
 
-                        <button
-                            class="action-btn comments-count"
-                            data-post-id="{{ $post->id }}"
-                        >
-                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-                                 viewBox="0 0 24 24">
-                                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-                            </svg>
+                        @if($post->comment_status != 'closed')
+                            <button
+                                class="action-btn comments-count"
+                                data-post-id="{{ $post->id }}"
+                                data-post-user-id="{{ $post->user_id }}"
+                            >
+                                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                                     viewBox="0 0 24 24">
+                                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                                </svg>
 
-                            <span class="comment-count-number">
+                                <span class="comment-count-number">
                                         {{ $post->post_comments }}
                                     </span>
-                        </button>
+                            </button>
+                        @endif
                     <button class="action-btn">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
                              viewBox="0 0 24 24">
@@ -278,95 +281,72 @@
                 </div>
                 <div class="post-time">{{ $post->created_at->diffForHumans() }}</div>
 
-                @if($post->comment_status == 'closed')
-                    <div class="no-comments" style="color: #8e8e8e; font-size: 14px; padding: 15px 0; padding-left: 12px;">
-                        No comments allowed for this post.
-                    </div>
-                @else
-                    <!-- Comments Section -->
-                    <div class="post-comments" style="padding: 0 16px; max-height: 200px; overflow-y: auto;">
-                        <div class="comments-list" id="comments-list-{{ $post->id }}">
-                            @if(isset($postWithInfo['comments']) && count($postWithInfo['comments']) > 0)
-                                @foreach($postWithInfo['comments'] as $comment)
-                                    <div class="comment-item">
-                                        <a href="{{route('profile',$comment->user->username)}}">
-                                            <img src="{{ asset('users/avatar/'.$comment->user->avatar) }}"
-                                                 class="comment-avatar"
-                                                 alt="{{ $comment->user->username }}">
-                                        </a>
-                                        <div class="comment-content">
-                                            <a href="{{route('profile',$comment->user->username)}}" style="text-decoration: none">
-                                                <strong class="comment-username">{{ $comment->user->username ?? 'Unknown' }}</strong>
-                                                @if($comment->user->role == 'admin' || $comment->user->role == 'verifiedUser')
-                                                    <svg class="verified-icon" width="14" height="14" fill="var(--accent)" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                                @endif
-                                            </a>
-                                            <span class="comment-text">{{ $comment->content }}</span>
-                                            <span class="post-time" style="color: #8e8e8e; font-size: 10px; margin-right: 8px; direction: ltr; display: inline-block;">{{ $comment->created_at->diffForHumans() }}</span>
-                                        </div>
-                                        <!-- Three-dot menu button -->
-                                        <div class="dropdown-wrapper">
-                                            <button class="btn-three-dot" onclick="toggleDropdown(event)">
-                                                <svg width="16" height="16" fill="white" viewBox="0 0 24 24">
-                                                    <circle cx="12" cy="5" r="2"/>
-                                                    <circle cx="12" cy="12" r="2"/>
-                                                    <circle cx="12" cy="19" r="2"/>
-                                                </svg>
-                                            </button>
+                    <!-- Comments Modal -->
+                    <div class="comments-modal" id="commentsModal">
 
-                                            <div class="dropdown-menu">
-                                                @if(auth()->id() != $comment->user_id)
-                                                    <span
-                                                        class="dropdown-item report-btn"
-                                                        data-id="{{ $comment->id }}"
-                                                        data-type="comment"
-                                                        data-uid="{{$comment->user_id}}">
-                                                        Report
-                                                  </span>
-                                                @endif
+                        <div class="comments-modal-content">
 
-                                                @if(auth()->id() == $comment->user_id || auth()->id() == $post->user_id)
-                                                    <span
-                                                        class="dropdown-item delete-comment"
-                                                        data-id="{{ $comment->id }}"
-                                                        data-uid="{{ $comment->user_id }}"
-                                                        data-post-id="{{ $post->id }}"
-                                                        data-post-uid="{{ $post->user_id }}"
-                                                    >
-                                                        Delete
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            @else
-                                <div class="no-comments" id="no-comments-{{ $post->id }}" style="color: #8e8e8e; font-size: 14px; padding: 10px 0;">
-                                    No comments yet. Be the first to comment!
-                                </div>
-                            @endif
-                        </div>
-                    </div>
+                            <div class="comments-modal-header">
+                                Comments
 
-                    <!-- Comment Input -->
-                    <div class="container">
-                        <div class="comment-box">
-                            <input
-                                type="text"
-                                class="comment-input"
-                                name="comment"
-                                placeholder="Add a comment…"
-                                id="comment-input-{{ $post->id }}"
-                            />
-                            <button
-                                class="post-btn submit-comment"
-                                data-post-id="{{ $post->id }}"
+                                <button
+                                    type="button"
+                                    class="comments-modal-close"
+                                    id="closeCommentsModal"
+                                >
+                                    ×
+                                </button>
+                            </div>
+
+                            <div
+                                class="comments-modal-body"
+                                id="modalCommentsList"
                             >
-                                Post
-                            </button>
+
+                            </div>
+
+                            <div
+                                id="commentsMoreLoading"
+                                class="comments-more-loading"
+                            >
+                                Loading more comments...
+                            </div>
+
+                            <div class="comments-modal-footer">
+
+                                <div
+                                    id="replyingIndicator"
+                                    class="replying-indicator"
+                                >
+                                    <span id="replyingText"></span>
+
+                                </div>
+
+                                <div class="comments-input-row">
+
+                                    <input
+                                        type="text"
+                                        id="modalCommentInput"
+                                        class="modal-comment-input"
+                                        placeholder="Add a comment…"
+                                    >
+
+                                    <button
+                                        type="button"
+                                        id="modalSubmitComment"
+                                        class="modal-comment-submit"
+                                    >
+                                        Post
+                                    </button>
+
+                                </div>
+
+                            </div>
+
                         </div>
+
                     </div>
-                @endif
+
             </div>
         </div>
     </div>

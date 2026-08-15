@@ -35,6 +35,11 @@ class profileController extends Controller
         $user = User::where('id', Auth::id())->first();
         return view('index.profile.editPasswordShow', compact('user'));
     }
+    public function showSavedPosts()
+    {
+        $user = Auth::user();
+        return $this->profileServices->GetUserSavedPosts($user->id);
+    }
     public function editProfile(profileEditInfoReqeust $request){
 
         $data = $request->validated();
