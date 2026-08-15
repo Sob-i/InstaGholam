@@ -656,14 +656,17 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
 }
 
 
-.report-modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.6);
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
+.report-modal {
+    position: fixed !important;
+    inset: 0 !important;
+
+    z-index: 1000000 !important;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.75);
 }
 
 .report-modal-content{
@@ -673,6 +676,8 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
     color:#fff;
     border-radius:12px;
     padding:20px;
+    position: relative;
+    z-index: 1000001;
 }
 
 .report-modal-header{
@@ -714,6 +719,12 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
     display: inline-block;
     vertical-align: middle;
     margin-left: -8px;
+}
+
+.verifiedJ-icon {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
 }
 
 .comments-modal {
@@ -805,10 +816,26 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
 
 .comments-modal-body {
     flex: 1;
+    min-height: 0;
 
     overflow-y: auto;
 
     padding: 18px;
+
+    box-sizing: border-box;
+}
+
+.comments-more-loading {
+    display: none;
+    flex-shrink: 0;
+    text-align: center;
+    color: #888;
+    font-size: 11px;
+    padding: 8px;
+}
+
+.comments-more-loading.active {
+    display: block;
 }
 
 .comments-modal-body::-webkit-scrollbar {
@@ -826,87 +853,73 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
 ========================= */
 
 .modal-comment-item {
-    display: flex;
-
-    gap: 10px;
-
+    width: 100%;
     margin-bottom: 20px;
-
     position: relative;
+    box-sizing: border-box;
+}
+
+.modal-comment-row,
+.modal-reply-row {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    gap: 10px;
 }
 
 .modal-comment-avatar {
     width: 38px;
     height: 38px;
-
     border-radius: 50%;
-
     object-fit: cover;
-
     flex-shrink: 0;
 }
 
 .modal-comment-content {
     flex: 1;
-
     min-width: 0;
 }
 
 .modal-comment-top {
     display: flex;
     align-items: center;
-
     gap: 5px;
 }
 
 .modal-comment-username {
     color: #fff;
-
     font-size: 13px;
     font-weight: 600;
-
     text-decoration: none;
 }
 
 .modal-comment-text {
     color: #ddd;
-
     font-size: 14px;
-
     line-height: 1.5;
-
     margin-top: 3px;
-
     word-break: break-word;
 }
 
 .modal-comment-meta {
     display: flex;
-
     align-items: center;
-
     gap: 12px;
-
     margin-top: 5px;
 }
 
 .modal-comment-time {
     color: #777;
-
     font-size: 10px;
 }
 
 .modal-reply-btn {
     border: none;
     background: none;
-
     padding: 0;
-
     color: #888;
-
     font-size: 11px;
     font-weight: 600;
-
     cursor: pointer;
 }
 
@@ -920,11 +933,12 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
 ========================= */
 
 .show-replies-btn {
+    display: block;
+
     border: none;
     background: none;
 
     padding: 0;
-
     margin-top: 8px;
 
     color: #999;
@@ -945,21 +959,38 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
 ========================= */
 
 .comment-replies {
-    margin-top: 14px;
+    display: block;
 
-    margin-left: 5px;
+    width: calc(100% - 48px);
 
-    padding-left: 18px;
+    margin-left: 48px;
+    margin-top: 12px;
+
+    padding-left: 15px;
 
     border-left: 1px solid #333;
+
+    box-sizing: border-box;
 }
 
 .modal-reply-item {
+    width: 100%;
+    margin-bottom: 15px;
+
+    position: relative;
+
+    box-sizing: border-box;
+}
+
+.modal-reply-row {
     display: flex;
+    align-items: flex-start;
 
     gap: 9px;
 
-    margin-bottom: 15px;
+    width: 100%;
+
+    box-sizing: border-box;
 }
 
 .modal-reply-item .modal-comment-avatar {
@@ -972,184 +1003,43 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
 }
 
 
-/* =========================
-   LOADING
-========================= */
+/* Nested replies */
 
-.comments-loading {
-    text-align: center;
+.modal-reply-item > .comment-replies {
+    width: calc(100% - 41px);
 
-    color: #888;
+    margin-left: 41px;
 
-    font-size: 14px;
+    margin-top: 10px;
 
-    padding: 40px 10px;
-}
-
-.comments-more-loading {
-    display: none;
-
-    text-align: center;
-
-    color: #888;
-
-    font-size: 11px;
-
-    padding: 8px;
-}
-
-.comments-more-loading.active {
-    display: block;
+    padding-left: 13px;
 }
 
 
 /* =========================
-   EMPTY
+   MENU
 ========================= */
-
-.no-modal-comments {
-    text-align: center;
-
-    color: #777;
-
-    padding: 50px 10px;
-
-    font-size: 14px;
-}
-
-
-/* =========================
-   FOOTER
-========================= */
-
-.comments-modal-footer {
-    position: relative;
-
-    padding: 10px 15px;
-
-    border-top: 1px solid #303030;
-}
-
-
-/* Reply indicator */
-
-.replying-indicator {
-    display: none;
-
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 5px 4px 8px;
-
-    color: #888;
-
-    font-size: 11px;
-}
-
-.replying-indicator.active {
-    display: flex;
-}
-
-.replying-indicator button {
-    border: none;
-    background: none;
-
-    color: #888;
-
-    font-size: 18px;
-
-    cursor: pointer;
-}
-
-
-/* Input */
-
-.comments-input-row {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-}
-
-.modal-comment-input {
-    flex: 1;
-
-    height: 40px;
-
-    border: 1px solid #333;
-    border-radius: 20px;
-
-    background: #222;
-
-    color: #fff;
-
-    padding: 0 15px;
-
-    outline: none;
-}
-
-.modal-comment-input:focus {
-    border-color: #555;
-}
-
-.modal-comment-submit {
-    border: none;
-
-    background: var(--accent);
-
-    color: #000;
-
-    font-weight: 600;
-
-    padding: 9px 16px;
-
-    border-radius: 20px;
-
-    cursor: pointer;
-}
-
-.modal-comment-submit:disabled {
-    opacity: 0.6;
-
-    cursor: not-allowed;
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 600px) {
-
-    .comments-modal {
-        padding: 0;
-    }
-
-    .comments-modal-content {
-        width: 100%;
-        height: 100vh;
-        max-height: none;
-
-        border-radius: 0;
-    }
-
-}
 
 .modal-comment-menu {
+    margin-left: auto;
     position: relative;
-
     flex-shrink: 0;
 }
 
-
 .modal-three-dot {
+    width: 30px;
+    height: 30px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     border: none;
-    background: none;
+    background: transparent;
 
     color: #888;
 
-    padding: 5px;
+    padding: 0;
 
     cursor: pointer;
 
@@ -1160,7 +1050,6 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
     background: #2a2a2a;
     color: #fff;
 }
-
 
 .modal-comment-dropdown {
     display: none;
@@ -1186,11 +1075,9 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
         0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
-
 .modal-comment-dropdown.active {
     display: block;
 }
-
 
 .modal-dropdown-item {
     display: block;
@@ -1213,12 +1100,84 @@ nav{flex:1;display:flex;flex-direction:column;gap:4px;}
     cursor: pointer;
 }
 
-
 .modal-dropdown-item:hover {
     background: #333;
 }
 
-
 .modal-dropdown-item.report-comment-btn {
     color: #ff6b6b;
+}
+
+.comments-modal-footer {
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 10px 15px;
+
+    border-top: 1px solid #303030;
+
+    background: #181818;
+}
+
+.comments-input-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+.modal-comment-input {
+    flex: 1;
+    min-width: 0;
+
+    height: 40px;
+
+    border: 1px solid #333;
+    border-radius: 20px;
+
+    background: #222;
+
+    color: #fff;
+
+    padding: 0 15px;
+
+    outline: none;
+    box-sizing: border-box;
+}
+
+.modal-comment-input:focus {
+    border-color: #555;
+}
+
+.modal-comment-submit {
+    flex-shrink: 0;
+
+    height: 40px;
+
+    border: none;
+
+    background: var(--accent);
+
+    color: #000;
+
+    font-weight: 600;
+
+    padding: 0 16px;
+
+    border-radius: 20px;
+
+    cursor: pointer;
+}
+
+.modal-comment-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.reply-mention {
+    color: var(--accent);
+    font-weight: 600;
+    margin-right: 4px;
 }

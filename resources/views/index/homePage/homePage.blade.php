@@ -327,43 +327,29 @@
 
             @endforeach
             <!-- Comments Modal -->
-            <div id="commentsModal" class="comments-modal">
+            <div class="comments-modal" id="commentsModal">
 
                 <div class="comments-modal-content">
 
-                    <!-- Header -->
                     <div class="comments-modal-header">
-
-                        <strong>Comments</strong>
+                        Comments
 
                         <button
                             type="button"
                             class="comments-modal-close"
                             id="closeCommentsModal"
                         >
-                            &times;
+                            ×
                         </button>
-
                     </div>
 
-
-                    <!-- Comments -->
                     <div
                         class="comments-modal-body"
                         id="modalCommentsList"
                     >
 
-                        <div
-                            class="comments-loading"
-                            id="commentsInitialLoading"
-                        >
-                            Loading comments...
-                        </div>
-
                     </div>
 
-
-                    <!-- Bottom loading indicator -->
                     <div
                         id="commentsMoreLoading"
                         class="comments-more-loading"
@@ -371,8 +357,6 @@
                         Loading more comments...
                     </div>
 
-
-                    <!-- Input -->
                     <div class="comments-modal-footer">
 
                         <div
@@ -381,12 +365,6 @@
                         >
                             <span id="replyingText"></span>
 
-                            <button
-                                type="button"
-                                id="cancelReply"
-                            >
-                                ×
-                            </button>
                         </div>
 
                         <div class="comments-input-row">
@@ -396,7 +374,6 @@
                                 id="modalCommentInput"
                                 class="modal-comment-input"
                                 placeholder="Add a comment…"
-                                autocomplete="off"
                             >
 
                             <button
@@ -927,243 +904,117 @@
         <script>
             $(document).ready(function () {
 
-                /*
-                |--------------------------------------------------------------------------
-                | GLOBAL STATE
-                |--------------------------------------------------------------------------
-                */
-
                 let currentPostId = null;
-
                 let currentPostUserId = null;
 
-                let currentCommentsPage = 1;
-
-                let commentsHasMore = false;
-
+                let commentsPage = 1;
                 let commentsLoading = false;
+                let commentsHasMore = true;
 
-                let replyingToCommentId = null;
+                let replyingToId = null;
+                let replyingToUsername = null;
 
+                let repliesLoading = {};
+                let repliesLoaded = {};
 
-                /*
-                |--------------------------------------------------------------------------
-                | OPEN COMMENTS MODAL
-                |--------------------------------------------------------------------------
-                */
+                function escapeHtml(text) {
+                    if (text === null || text === undefined) {
+                        return '';
+                    }
 
-                $(document).on('click', '.comments-count', function (e) {
+                    return $('<div>').text(text).html();
+                }
 
-                    e.preventDefault();
+                function formatMention(text) {
+                    return text.replace(
+                        /@([a-zA-Z0-9_.]+)/g,
+                        '<span style="color: var(--accent);">@$1</span>'
+                    );
+                }
 
-                    const $button = $(this);
+                function getAvatar(avatar) {
+                    if (!avatar) {
+                        return '/users/avatar/default-avatar.png';
+                    }
 
-                    currentPostId = $button.data('post-id');
+                    return '/users/avatar/' + avatar;
+                }
 
-                    currentPostUserId = $button.data('post-user-id');
+                function buildCommentMenu(comment) {
 
-                    openCommentsModal();
+                    let items = '';
 
-                });
+                    if (comment.can_report) {
 
+                        items += `
+        <button
+            type="button"
+            class="modal-dropdown-item report-comment-btn"
+            data-id="${comment.id}"
+            data-type="comment"
+            data-uid="${comment.user_id}"
+        >
+            Report
+        </button>
+    `;
+                    }
 
-                function openCommentsModal() {
+                    if (comment.can_delete) {
+                        items += `
+                <button
+                    type="button"
+                    class="modal-dropdown-item delete-comment"
+                    data-id="${comment.id}"
+                    data-uid="${comment.user_id}"
+                    data-post-id="${currentPostId}"
+                    data-post-uid="${currentPostUserId}"
+                >
+                    Delete
+                </button>
+            `;
+                    }
 
-                    currentCommentsPage = 1;
+                    if (!items) {
+                        return '';
+                    }
 
-                    commentsHasMore = false;
+                    return `
+            <div class="modal-comment-menu">
 
-                    commentsLoading = false;
+                <button
+                    type="button"
+                    class="modal-three-dot"
+                >
+                    <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                    >
+                        <circle cx="12" cy="5" r="2"/>
+                        <circle cx="12" cy="12" r="2"/>
+                        <circle cx="12" cy="19" r="2"/>
+                    </svg>
+                </button>
 
-                    replyingToCommentId = null;
+                <div class="modal-comment-dropdown">
+                    ${items}
+                </div>
 
-
-                    resetReplyState();
-
-
-                    $('#commentsModal').addClass('active');
-
-
-                    $('#modalCommentsList').html(`
-            <div class="comments-loading">
-                Loading comments...
             </div>
-        `);
-
-
-                    $('#commentsMoreLoading')
-                        .removeClass('active');
-
-
-                    loadComments(1, true);
-
+        `;
                 }
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | GET COMMENTS
-                |--------------------------------------------------------------------------
-                */
-
-                function loadComments(page, initialLoad = false) {
-
-                    if (commentsLoading) {
-                        return;
-                    }
-
-
-                    if (!initialLoad && !commentsHasMore) {
-                        return;
-                    }
-
-
-                    commentsLoading = true;
-
-
-                    if (!initialLoad) {
-
-                        $('#commentsMoreLoading')
-                            .addClass('active');
-
-                    }
-
-
-                    $.ajax({
-
-                        url: `/post/${currentPostId}/comments`,
-
-                        method: 'GET',
-
-                        data: {
-                            page: page
-                        },
-
-
-                        success: function (response) {
-
-                            if (!response.status) {
-
-                                if (initialLoad) {
-
-                                    $('#modalCommentsList').html(`
-                            <div class="no-modal-comments">
-                                No comments yet. Be the first to comment!
-                            </div>
-                        `);
-
-                                }
-
-                                commentsHasMore = false;
-
-                                return;
-                            }
-
-
-                            if (initialLoad) {
-
-                                $('#modalCommentsList').empty();
-
-                            }
-
-
-                            if (
-                                response.comments &&
-                                response.comments.length > 0
-                            ) {
-
-                                response.comments.forEach(function (comment) {
-
-                                    appendComment(comment);
-
-                                });
-
-                            }
-
-
-                            currentCommentsPage =
-                                response.current_page;
-
-                            commentsHasMore =
-                                response.has_more;
-
-
-                            if (
-                                initialLoad &&
-                                (
-                                    !response.comments ||
-                                    response.comments.length === 0
-                                )
-                            ) {
-
-                                $('#modalCommentsList').html(`
-                        <div class="no-modal-comments">
-                            No comments yet. Be the first to comment!
-                        </div>
-                    `);
-
-                            }
-
-                        },
-
-
-                        error: function (xhr) {
-
-                            console.error(
-                                'Comments loading error:',
-                                xhr.responseText
-                            );
-
-
-                            if (initialLoad) {
-
-                                $('#modalCommentsList').html(`
-                        <div class="no-modal-comments">
-                            Failed to load comments.
-                        </div>
-                    `);
-
-                            }
-
-                        },
-
-
-                        complete: function () {
-
-                            commentsLoading = false;
-
-                            $('#commentsMoreLoading')
-                                .removeClass('active');
-
-                        }
-
-                    });
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | CREATE COMMENT HTML
-                |--------------------------------------------------------------------------
-                */
-
-                function appendComment(comment) {
-
-                    const avatar = comment.user.avatar
-                        ? `/users/avatar/${comment.user.avatar}`
-                        : `/users/avatar/default-avatar.png`;
-
-
-                    let verifiedIcon = '';
-
+                function buildVerifiedIcon(user) {
 
                     if (
-                        comment.user.role === 'admin' ||
-                        comment.user.role === 'verifiedUser'
+                        user &&
+                        (
+                            user.role === 'admin' ||
+                            user.role === 'verifiedUser'
+                        )
                     ) {
-
-                        verifiedIcon = `
+                        return `
                 <svg
                     class="verified-icon"
                     width="14"
@@ -1174,286 +1025,706 @@
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             `;
-
                     }
 
+                    return '';
+                }
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | SHOW REPLIES BUTTON
-                    |--------------------------------------------------------------------------
-                    */
+                function buildRepliesButton(comment) {
 
-                    let repliesButton = '';
+                    const count = parseInt(comment.replies_count) || 0;
 
-
-                    if (
-                        comment.replies_count &&
-                        comment.replies_count > 0
-                    ) {
-
-                        repliesButton = `
-
-                <button
-                    type="button"
-                    class="show-replies-btn"
-                    data-post-id="${currentPostId}"
-                    data-comment-id="${comment.id}"
-                    data-replies-count="${comment.replies_count}"
-                >
-
-                    View
-                    ${comment.replies_count}
-                    ${
-                            comment.replies_count == 1
-                                ? 'reply'
-                                : 'replies'
-                        }
-
-                </button>
-
-            `;
-
+                    if (count <= 0) {
+                        return '';
                     }
 
+                    return `
+            <button
+                type="button"
+                class="show-replies-btn"
+                data-post-id="${currentPostId}"
+                data-comment-id="${comment.id}"
+            >
+                View ${count}
+                ${count === 1 ? 'reply' : 'replies'}
+            </button>
+        `;
+                }
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | REPORT BUTTON
-                    |--------------------------------------------------------------------------
-                    */
+                function appendComment(comment, prepend = false) {
 
-                    let reportButton = '';
+                    const username =
+                        comment.user?.username || 'Unknown';
 
+                    const avatar =
+                        getAvatar(comment.user?.avatar);
 
-                    if (
-                        CURRENT_USER_ID != comment.user.id
-                    ) {
+                    const verifiedIcon =
+                        buildVerifiedIcon(comment.user);
 
-                        reportButton = `
+                    const repliesButton =
+                        buildRepliesButton(comment);
 
-                <button
-                    type="button"
-                    class="dropdown-item report-btn"
-                    data-id="${comment.id}"
-                    data-type="comment"
-                    data-uid="${comment.user.id}"
-                >
-                    Report
-                </button>
-
-            `;
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | DELETE BUTTON
-                    |--------------------------------------------------------------------------
-                    */
-
-                    let deleteButton = '';
-
-
-                    if (
-                        CURRENT_USER_ID == comment.user.id ||
-                        CURRENT_USER_ID == currentPostUserId
-                    ) {
-
-                        deleteButton = `
-
-                <button
-                    type="button"
-                    class="dropdown-item delete-comment"
-                    data-id="${comment.id}"
-                    data-uid="${comment.user.id}"
-                    data-post-id="${currentPostId}"
-                    data-post-uid="${currentPostUserId}"
-                >
-                    Delete
-                </button>
-
-            `;
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | COMPLETE COMMENT HTML
-                    |--------------------------------------------------------------------------
-                    */
+                    const menu =
+                        buildCommentMenu(comment);
 
                     const html = `
-
             <div
                 class="modal-comment-item"
                 data-comment-id="${comment.id}"
             >
 
-                <a href="/profile/${encodeURIComponent(comment.user.username)}">
+                <div class="modal-comment-row">
+
+                    <a href="/profile/${encodeURIComponent(username)}">
+
+                        <img
+                            src="${avatar}"
+                            class="modal-comment-avatar"
+                            alt="${escapeHtml(username)}"
+                        >
+
+                    </a>
+
+                    <div class="modal-comment-content">
+
+                        <div class="modal-comment-top">
+
+                            <a
+                                href="/profile/${encodeURIComponent(username)}"
+                                class="modal-comment-username"
+                            >
+                                ${escapeHtml(username)}
+                            </a>
+
+                           <span class="verifiedJ-icon">
+                             ${verifiedIcon}
+                        </span>
+
+                        </div>
+
+                        <div class="modal-comment-text">
+                            ${formatMention(
+                        escapeHtml(comment.content)
+                    )}
+                        </div>
+
+                        <div class="modal-comment-meta">
+
+                            <span class="modal-comment-time">
+                                ${escapeHtml(
+                        comment.created_at || 'Just now'
+                    )}
+                            </span>
+
+                            <button
+                                type="button"
+                                class="modal-reply-btn"
+                                data-comment-id="${comment.id}"
+                                data-username="${escapeHtml(username)}"
+                            >
+                                Reply
+                            </button>
+
+                        </div>
+
+                        ${repliesButton}
+
+                    </div>
+
+                    ${menu}
+
+                </div>
+
+            </div>
+        `;
+
+                    if (prepend) {
+                        $('#modalCommentsList').prepend(html);
+                    } else {
+                        $('#modalCommentsList').append(html);
+                    }
+                }
+
+                function appendReply($container, reply) {
+
+                    const username =
+                        reply.user?.username || 'Unknown';
+
+                    const avatar =
+                        getAvatar(reply.user?.avatar);
+
+                    const verifiedIcon =
+                        buildVerifiedIcon(reply.user);
+
+                    const menu =
+                        buildCommentMenu(reply);
+
+                    let mention = '';
+
+                    const repliesButton =
+                        buildRepliesButton(reply);
+
+                    const html = `
+        <div
+            class="modal-reply-item"
+            data-comment-id="${reply.id}"
+            data-parent-id="${reply.reply_comment_id || ''}"
+        >
+
+            <div class="modal-reply-row">
+
+                <a href="/profile/${encodeURIComponent(username)}">
 
                     <img
                         src="${avatar}"
                         class="modal-comment-avatar"
-                        alt="${escapeHtml(comment.user.username)}"
+                        alt="${escapeHtml(username)}"
                     >
 
                 </a>
-
 
                 <div class="modal-comment-content">
 
                     <div class="modal-comment-top">
 
                         <a
-                            href="/profile/${encodeURIComponent(comment.user.username)}"
+                            href="/profile/${encodeURIComponent(username)}"
                             class="modal-comment-username"
                         >
-                            ${escapeHtml(comment.user.username)}
+                            ${escapeHtml(username)}
                         </a>
-
-                        ${verifiedIcon}
+                        <span class="verifiedJ-icon">
+                             ${verifiedIcon}
+                        </span>
 
                     </div>
-
 
                     <div class="modal-comment-text">
 
-                        ${escapeHtml(comment.content)}
-
+                        ${formatMention(
+                        escapeHtml(reply.content)
+                    )}
                     </div>
-
 
                     <div class="modal-comment-meta">
 
                         <span class="modal-comment-time">
-
-                            ${escapeHtml(comment.created_at)}
-
+                            ${escapeHtml(
+                        reply.created_at || 'Just now'
+                    )}
                         </span>
-
 
                         <button
                             type="button"
                             class="modal-reply-btn"
-                            data-comment-id="${comment.id}"
-                            data-username="${escapeHtml(comment.user.username)}"
+                            data-comment-id="${reply.id}"
+                            data-username="${escapeHtml(username)}"
                         >
                             Reply
                         </button>
 
                     </div>
 
-
                     ${repliesButton}
 
                 </div>
 
-
-                <!-- THREE DOT MENU -->
-
-                <div class="modal-comment-menu">
-
-                    <button
-                        type="button"
-                        class="modal-three-dot"
-                        aria-label="Comment options"
-                    >
-
-                        <svg
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-
-                            <circle
-                                cx="12"
-                                cy="5"
-                                r="2"
-                            />
-
-                            <circle
-                                cx="12"
-                                cy="12"
-                                r="2"
-                            />
-
-                            <circle
-                                cx="12"
-                                cy="19"
-                                r="2"
-                            />
-
-                        </svg>
-
-                    </button>
-
-
-                    <div class="modal-comment-dropdown">
-
-                        ${reportButton}
-
-                        ${deleteButton}
-
-                    </div>
-
-                </div>
+                ${menu}
 
             </div>
 
-        `;
+        </div>
+    `;
 
-
-                    $('#modalCommentsList')
-                        .append(html);
-
+                    $container.append(html);
                 }
 
+                function loadComments(reset = false) {
 
-                /*
-                |--------------------------------------------------------------------------
-                | LOAD MORE COMMENTS ON SCROLL
-                |--------------------------------------------------------------------------
-                */
+                    if (commentsLoading) {
+                        return;
+                    }
 
-                $('#modalCommentsList').on(
-                    'scroll',
-                    function () {
+                    if (!commentsHasMore && !reset) {
+                        return;
+                    }
 
-                        const element = this;
+                    if (reset) {
+                        commentsPage = 1;
+                        commentsHasMore = true;
+                        $('#modalCommentsList').empty();
+                    }
 
+                    commentsLoading = true;
 
-                        const distanceFromBottom =
-                            element.scrollHeight -
-                            element.scrollTop -
-                            element.clientHeight;
+                    if (commentsPage === 1) {
+                        $('#modalCommentsList').html(`
+                <div class="comments-loading">
+                    Loading comments...
+                </div>
+            `);
+                    } else {
+                        $('#commentsMoreLoading').addClass('active');
+                    }
 
+                    $.ajax({
+                        url: '/post/' + currentPostId + '/comments',
+                        method: 'GET',
+                        data: {
+                            page: commentsPage
+                        },
 
-                        if (
-                            distanceFromBottom < 150 &&
-                            commentsHasMore &&
-                            !commentsLoading
-                        ) {
+                        success: function (response) {
 
-                            loadComments(
-                                currentCommentsPage + 1,
-                                false
+                            if (commentsPage === 1) {
+                                $('#modalCommentsList').empty();
+                            }
+
+                            if (
+                                response.status &&
+                                response.comments &&
+                                response.comments.length
+                            ) {
+
+                                response.comments.forEach(function (comment) {
+                                    appendComment(comment);
+                                });
+
+                                commentsHasMore =
+                                    response.has_more;
+
+                                if (commentsHasMore) {
+                                    commentsPage++;
+                                }
+
+                            } else if (commentsPage === 1) {
+
+                                $('#modalCommentsList').html(`
+                        <div
+                            class="no-modal-comments"
+                            id="no-modal-comments"
+                        >
+                            No comments yet.
+                        </div>
+                    `);
+
+                                commentsHasMore = false;
+                            }
+                        },
+
+                        error: function (xhr) {
+                            console.error(
+                                'Comments error:',
+                                xhr.responseText
+                            );
+                        },
+
+                        complete: function () {
+
+                            commentsLoading = false;
+
+                            $('#commentsMoreLoading')
+                                .removeClass('active');
+                        }
+                    });
+                }
+
+                function loadReplies(parentId, $parent) {
+
+                    if (repliesLoading[parentId]) {
+                        return;
+                    }
+
+                    repliesLoading[parentId] = true;
+
+                    let $replies =
+                        $parent.children('.comment-replies');
+
+                    if (!$replies.length) {
+
+                        $replies = $(`
+                <div
+                    class="comment-replies"
+                    data-parent-id="${parentId}"
+                ></div>
+            `);
+
+                        $parent.append($replies);
+                    }
+
+                    if (!repliesLoaded[parentId]) {
+
+                        $replies.html(`
+                <div class="comments-loading">
+                    Loading replies...
+                </div>
+            `);
+                    }
+
+                    let page =
+                        repliesLoaded[parentId]?.page || 1;
+
+                    $.ajax({
+                        url:
+                            '/post/' +
+                            currentPostId +
+                            '/comment/' +
+                            parentId +
+                            '/replies',
+
+                        method: 'GET',
+
+                        data: {
+                            page: page
+                        },
+
+                        success: function (response) {
+
+                            if (!repliesLoaded[parentId]) {
+                                $replies.empty();
+                            }
+
+                            if (
+                                response.status &&
+                                response.replies &&
+                                response.replies.length
+                            ) {
+
+                                response.replies.forEach(function (reply) {
+                                    appendReply($replies, reply);
+                                });
+
+                                repliesLoaded[parentId] = {
+                                    page: response.current_page + 1,
+                                    hasMore: response.has_more
+                                };
+
+                                const $button =
+                                    $parent.find(
+                                        '.show-replies-btn'
+                                    ).first();
+
+                                if (response.has_more) {
+
+                                    $button.text(
+                                        'View more replies'
+                                    );
+
+                                } else {
+
+                                    $button.remove();
+                                }
+
+                            } else {
+
+                                repliesLoaded[parentId] = {
+                                    page: page,
+                                    hasMore: false
+                                };
+                            }
+                        },
+
+                        error: function (xhr) {
+
+                            console.error(
+                                'Replies error:',
+                                xhr.responseText
+                            );
+                        },
+
+                        complete: function () {
+                            repliesLoading[parentId] = false;
+                        }
+                    });
+                }
+
+                function startReply(commentId, username) {
+
+                    replyingToId = commentId;
+                    replyingToUsername = username;
+
+                    $('#replyingText').html(
+                        'Replying to <strong>@' +
+                        escapeHtml(username) +
+                        '</strong>'
+                    );
+
+                    $('#replyingIndicator').addClass('active');
+
+                    $('#modalCommentInput')
+                        .attr(
+                            'placeholder',
+                            'Reply to @' + username + '…'
+                        )
+                        .val('')
+                        .focus();
+                }
+
+                function cancelReply() {
+
+                    replyingToId = null;
+                    replyingToUsername = null;
+
+                    $('#replyingIndicator')
+                        .removeClass('active');
+
+                    $('#modalCommentInput')
+                        .attr(
+                            'placeholder',
+                            'Add a comment…'
+                        )
+                        .val('');
+                }
+
+                function submitComment() {
+
+                    const $input =
+                        $('#modalCommentInput');
+
+                    const $button =
+                        $('#modalSubmitComment');
+
+                    const text =
+                        $input.val().trim();
+
+                    if (!text) {
+                        $input.focus();
+                        return;
+                    }
+
+                    $button
+                        .prop('disabled', true)
+                        .text('Posting...');
+
+                    $.ajax({
+                        url:
+                            '/post/' +
+                            currentPostId +
+                            '/sendComment',
+
+                        method: 'POST',
+
+                        data: {
+                            _token:
+                                $('meta[name="csrf-token"]').attr('content'),
+
+                            comment: text
+                        },
+
+                        success: function (response) {
+
+                            if (!response.success) {
+                                return;
+                            }
+
+                            $('#no-modal-comments').remove();
+
+                            appendComment(
+                                response.comment,
+                                true
                             );
 
-                        }
+                            $input.val('');
 
+                            $input.focus();
+
+                            $('.comments-modal-body')
+                                .scrollTop(0);
+                        },
+
+                        error: function (xhr) {
+
+                            if (xhr.status === 422) {
+
+                                const errors =
+                                    xhr.responseJSON.errors;
+
+                                let message = '';
+
+                                for (let field in errors) {
+                                    message +=
+                                        errors[field].join('\n') +
+                                        '\n';
+                                }
+
+                                alert(message);
+
+                            } else if (xhr.status === 401) {
+
+                                alert('Please login');
+
+                            } else {
+
+                                console.error(
+                                    xhr.responseText
+                                );
+
+                                alert('An error occurred');
+                            }
+                        },
+
+                        complete: function () {
+
+                            $button
+                                .prop('disabled', false)
+                                .text('Post');
+                        }
+                    });
+                }
+
+                function submitReply() {
+
+                    const $input = $('#modalCommentInput');
+                    const $button = $('#modalSubmitComment');
+
+                    const text = $input.val().trim();
+
+                    if (!text || !replyingToId) {
+                        return;
+                    }
+
+                    $button
+                        .prop('disabled', true)
+                        .text('Posting...');
+
+                    $.ajax({
+                        url:
+                            '/post/' +
+                            currentPostId +
+                            '/' +
+                            replyingToId +
+                            '/sendCommentReply',
+
+                        method: 'POST',
+
+                        data: {
+                            _token:
+                                $('meta[name="csrf-token"]').attr('content'),
+
+                            reply: text
+                        },
+
+                        success: function (response) {
+
+                            if (!response.success) {
+                                return;
+                            }
+
+                            let parentId =
+                                response.reply.reply_comment_id ||
+                                replyingToId;
+
+                            let $parent =
+                                $('[data-comment-id="' + parentId + '"]').first();
+
+                            let $replies =
+                                $parent.children('.comment-replies');
+
+                            if (!$replies.length) {
+
+                                $replies = $(`
+                    <div
+                        class="comment-replies"
+                        data-parent-id="${parentId}"
+                    ></div>
+                `);
+
+                                $parent.append($replies);
+                            }
+
+                            response.reply.replying_to_username =
+                                replyingToUsername;
+
+                            appendReply(
+                                $replies,
+                                response.reply
+                            );
+
+                            $input.val('');
+
+                            cancelReply();
+                        },
+
+                        error: function (xhr) {
+
+                            if (xhr.status === 422) {
+
+                                const errors =
+                                    xhr.responseJSON.errors;
+
+                                let message = '';
+
+                                for (let field in errors) {
+                                    message +=
+                                        errors[field].join('\n') +
+                                        '\n';
+                                }
+
+                                alert(message);
+
+                            } else {
+
+                                console.error(
+                                    xhr.responseText
+                                );
+
+                                alert('An error occurred');
+                            }
+                        },
+
+                        complete: function () {
+
+                            $button
+                                .prop('disabled', false)
+                                .text('Post');
+                        }
+                    });
+                }
+
+                $(document).on(
+                    'click',
+                    '.comments-count',
+                    function () {
+
+                        currentPostId =
+                            $(this).data('post-id');
+
+                        currentPostUserId =
+                            $(this).data('post-user-id');
+
+                        commentsPage = 1;
+                        commentsHasMore = true;
+
+                        repliesLoading = {};
+                        repliesLoaded = {};
+
+                        cancelReply();
+
+                        $('#commentsModal')
+                            .addClass('active');
+
+                        loadComments(true);
                     }
                 );
 
+                $(document).on(
+                    'click',
+                    '#closeCommentsModal, .comments-modal',
+                    function (e) {
 
-                /*
-                |--------------------------------------------------------------------------
-                | THREE DOT MENU
-                |--------------------------------------------------------------------------
-                */
+                        if (
+                            e.target === this ||
+                            $(e.target).is('#closeCommentsModal')
+                        ) {
+
+                            $('#commentsModal')
+                                .removeClass('active');
+
+                            cancelReply();
+                        }
+                    }
+                );
 
                 $(document).on(
                     'click',
@@ -1461,31 +1732,28 @@
                     function (e) {
 
                         e.preventDefault();
-
                         e.stopPropagation();
 
-
-                        const $menu =
+                        const $dropdown =
                             $(this)
-                                .siblings('.modal-comment-dropdown');
-
+                                .closest('.modal-comment-menu')
+                                .find('.modal-comment-dropdown');
 
                         $('.modal-comment-dropdown')
-                            .not($menu)
+                            .not($dropdown)
                             .removeClass('active');
 
-
-                        $menu.toggleClass('active');
-
+                        $dropdown.toggleClass('active');
                     }
                 );
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | CLOSE DROPDOWNS WHEN CLICKING OUTSIDE
-                |--------------------------------------------------------------------------
-                */
+                $(document).on(
+                    'click',
+                    '.modal-comment-dropdown',
+                    function (e) {
+                        e.stopPropagation();
+                    }
+                );
 
                 $(document).on(
                     'click',
@@ -1493,408 +1761,8 @@
 
                         $('.modal-comment-dropdown')
                             .removeClass('active');
-
                     }
                 );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | SHOW REPLIES
-                |--------------------------------------------------------------------------
-                */
-
-                $(document).on(
-                    'click',
-                    '.show-replies-btn',
-                    function (e) {
-
-                        e.preventDefault();
-
-                        e.stopPropagation();
-
-
-                        const $button = $(this);
-
-
-                        const postId =
-                            $button.data('post-id');
-
-
-                        const commentId =
-                            $button.data('comment-id');
-
-
-                        const commentItem =
-                            $(
-                                `.modal-comment-item[data-comment-id="${commentId}"]`
-                            );
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | Don't load twice
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (
-                            commentItem.find('.comment-replies').length
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        $button
-                            .prop('disabled', true)
-                            .text('Loading replies...');
-
-
-                        $.ajax({
-
-                            url:
-                                `/post/${postId}/comment/${commentId}/replies`,
-
-                            method: 'GET',
-
-                            data: {
-                                page: 1
-                            },
-
-
-                            success: function (response) {
-
-                                if (!response.status) {
-
-                                    $button
-                                        .prop('disabled', false)
-                                        .text('No replies');
-
-                                    return;
-
-                                }
-
-
-                                const $repliesContainer = $(`
-                        <div
-                            class="comment-replies"
-                            data-comment-id="${commentId}"
-                        ></div>
-                    `);
-
-
-                                if (
-                                    response.replies &&
-                                    response.replies.length > 0
-                                ) {
-
-                                    response.replies.forEach(
-                                        function (reply) {
-
-                                            appendReply(
-                                                $repliesContainer,
-                                                reply
-                                            );
-
-                                        }
-                                    );
-
-                                }
-
-
-                                commentItem
-                                    .find('.modal-comment-content')
-                                    .append($repliesContainer);
-
-
-                                $button.remove();
-
-
-                                /*
-                                |--------------------------------------------------------------------------
-                                | More replies
-                                |--------------------------------------------------------------------------
-                                */
-
-                                if (response.has_more) {
-
-                                    $repliesContainer.append(`
-
-                            <button
-                                type="button"
-                                class="load-more-replies"
-                                data-post-id="${postId}"
-                                data-comment-id="${commentId}"
-                                data-page="${response.current_page}"
-                            >
-                                View more replies
-                            </button>
-
-                        `);
-
-                                }
-
-                            },
-
-
-                            error: function (xhr) {
-
-                                console.error(
-                                    'Replies loading error:',
-                                    xhr.responseText
-                                );
-
-
-                                $button
-                                    .prop('disabled', false)
-                                    .text(
-                                        `View ${$button.data('replies-count')} replies`
-                                    );
-
-                            }
-
-                        });
-
-                    }
-                );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | CREATE REPLY HTML
-                |--------------------------------------------------------------------------
-                */
-
-                function appendReply($container, reply) {
-
-                    const avatar = reply.user.avatar
-                        ? `/users/avatar/${reply.user.avatar}`
-                        : `/users/avatar/default-avatar.png`;
-
-
-                    let verifiedIcon = '';
-
-
-                    if (
-                        reply.user.role === 'admin' ||
-                        reply.user.role === 'verifiedUser'
-                    ) {
-
-                        verifiedIcon = `
-                <svg
-                    class="verified-icon"
-                    width="13"
-                    height="13"
-                    fill="var(--accent)"
-                    viewBox="0 0 24 24"
-                >
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            `;
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | REPORT
-                    |--------------------------------------------------------------------------
-                    */
-
-                    let reportButton = '';
-
-
-                    if (
-                        CURRENT_USER_ID != reply.user.id
-                    ) {
-
-                        reportButton = `
-
-                <button
-                    type="button"
-                    class="dropdown-item report-btn"
-                    data-id="${reply.id}"
-                    data-type="comment"
-                    data-uid="${reply.user.id}"
-                >
-                    Report
-                </button>
-
-            `;
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | DELETE
-                    |--------------------------------------------------------------------------
-                    */
-
-                    let deleteButton = '';
-
-
-                    if (
-                        CURRENT_USER_ID == reply.user.id ||
-                        CURRENT_USER_ID == currentPostUserId
-                    ) {
-
-                        deleteButton = `
-
-                <button
-                    type="button"
-                    class="dropdown-item delete-comment"
-                    data-id="${reply.id}"
-                    data-uid="${reply.user.id}"
-                    data-post-id="${currentPostId}"
-                    data-post-uid="${currentPostUserId}"
-                >
-                    Delete
-                </button>
-
-            `;
-
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | REPLY HTML
-                    |--------------------------------------------------------------------------
-                    */
-
-                    const html = `
-
-            <div
-                class="modal-reply-item"
-                data-comment-id="${reply.id}"
-            >
-
-                <a href="/profile/${encodeURIComponent(reply.user.username)}">
-
-                    <img
-                        src="${avatar}"
-                        class="modal-comment-avatar"
-                        alt="${escapeHtml(reply.user.username)}"
-                    >
-
-                </a>
-
-
-                <div class="modal-comment-content">
-
-                    <div class="modal-comment-top">
-
-                        <a
-                            href="/profile/${encodeURIComponent(reply.user.username)}"
-                            class="modal-comment-username"
-                        >
-                            ${escapeHtml(reply.user.username)}
-                        </a>
-
-                        ${verifiedIcon}
-
-                    </div>
-
-
-                    <div class="modal-comment-text">
-
-                        ${escapeHtml(reply.content)}
-
-                    </div>
-
-
-                    <div class="modal-comment-meta">
-
-                        <span class="modal-comment-time">
-
-                            ${escapeHtml(reply.created_at)}
-
-                        </span>
-
-
-                        <!-- REPLY BUTTON ON REPLY -->
-
-                        <button
-                            type="button"
-                            class="modal-reply-btn"
-                            data-comment-id="${reply.id}"
-                            data-username="${escapeHtml(reply.user.username)}"
-                        >
-                            Reply
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <!-- THREE DOT MENU -->
-
-                <div class="modal-comment-menu">
-
-                    <button
-                        type="button"
-                        class="modal-three-dot"
-                        aria-label="Reply options"
-                    >
-
-                        <svg
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-
-                            <circle
-                                cx="12"
-                                cy="5"
-                                r="2"
-                            />
-
-                            <circle
-                                cx="12"
-                                cy="12"
-                                r="2"
-                            />
-
-                            <circle
-                                cx="12"
-                                cy="19"
-                                r="2"
-                            />
-
-                        </svg>
-
-                    </button>
-
-
-                    <div class="modal-comment-dropdown">
-
-                        ${reportButton}
-
-                        ${deleteButton}
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        `;
-
-
-                    $container.append(html);
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | REPLY BUTTON
-                |--------------------------------------------------------------------------
-                */
 
                 $(document).on(
                     'click',
@@ -1903,851 +1771,77 @@
 
                         e.preventDefault();
 
-
                         const commentId =
                             $(this).data('comment-id');
-
 
                         const username =
                             $(this).data('username');
 
-
-                        replyingToCommentId =
-                            commentId;
-
-
-                        $('#replyingText').text(
-                            `Replying to @${username}`
+                        startReply(
+                            commentId,
+                            username
                         );
-
-
-                        $('#replyingIndicator')
-                            .addClass('active');
-
-
-                        $('#modalCommentInput')
-                            .attr(
-                                'placeholder',
-                                `Reply to @${username}...`
-                            )
-                            .focus();
-
                     }
                 );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | CANCEL REPLY
-                |--------------------------------------------------------------------------
-                */
-
-                $('#cancelReply').on(
-                    'click',
-                    function () {
-
-                        resetReplyState();
-
-                    }
-                );
-
-
-                function resetReplyState() {
-
-                    replyingToCommentId = null;
-
-
-                    $('#replyingIndicator')
-                        .removeClass('active');
-
-
-                    $('#replyingText')
-                        .text('');
-
-
-                    $('#modalCommentInput')
-                        .attr(
-                            'placeholder',
-                            'Add a comment…'
-                        )
-                        .val('');
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | SUBMIT COMMENT / REPLY
-                |--------------------------------------------------------------------------
-                */
-
-                $('#modalSubmitComment').on(
-                    'click',
-                    function () {
-
-                        const $button = $(this);
-
-                        const $input =
-                            $('#modalCommentInput');
-
-
-                        const content =
-                            $input.val().trim();
-
-
-                        if (content === '') {
-
-                            $input.focus();
-
-                            return;
-
-                        }
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | REPLY
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (replyingToCommentId) {
-
-                            sendReply(
-                                content,
-                                $button,
-                                $input
-                            );
-
-                            return;
-
-                        }
-
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | NORMAL COMMENT
-                        |--------------------------------------------------------------------------
-                        */
-
-                        sendComment(
-                            content,
-                            $button,
-                            $input
-                        );
-
-                    }
-                );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | SEND NORMAL COMMENT
-                |--------------------------------------------------------------------------
-                */
-
-                function sendComment(
-                    content,
-                    $button,
-                    $input
-                ) {
-
-                    $button
-                        .prop('disabled', true)
-                        .text('Posting...');
-
-
-                    $.ajax({
-
-                        url:
-                            `/post/${currentPostId}/sendComment`,
-
-                        method: 'POST',
-
-                        data: {
-
-                            _token:
-                                $('meta[name="csrf-token"]').attr(
-                                    'content'
-                                ),
-
-                            comment: content
-
-                        },
-
-
-                        success: function (response) {
-
-                            if (!response.success) {
-                                return;
-                            }
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Remove empty state
-                            |--------------------------------------------------------------------------
-                            */
-
-                            $('#modalCommentsList')
-                                .find('.no-modal-comments')
-                                .remove();
-
-
-                            const comment =
-                                response.comment;
-
-
-                            appendCommentToTop(comment);
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Update count
-                            |--------------------------------------------------------------------------
-                            */
-
-                            updatePostCommentCount(
-                                currentPostId,
-                                1
-                            );
-
-
-                            $input
-                                .val('')
-                                .focus();
-
-                        },
-
-
-                        error: handleAjaxError,
-
-
-                        complete: function () {
-
-                            $button
-                                .prop('disabled', false)
-                                .text('Post');
-
-                        }
-
-                    });
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | INSERT NEW COMMENT AT TOP
-                |--------------------------------------------------------------------------
-                */
-
-                function appendCommentToTop(comment) {
-
-                    const avatar = comment.user.avatar
-                        ? `/users/avatar/${comment.user.avatar}`
-                        : `/users/avatar/default-avatar.png`;
-
-
-                    let verifiedIcon = '';
-
-
-                    if (
-                        comment.user.role === 'admin' ||
-                        comment.user.role === 'verifiedUser'
-                    ) {
-
-                        verifiedIcon = `
-                <svg
-                    class="verified-icon"
-                    width="14"
-                    height="14"
-                    fill="var(--accent)"
-                    viewBox="0 0 24 24"
-                >
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            `;
-
-                    }
-
-
-                    let repliesButton = '';
-
-
-                    if (
-                        comment.replies_count &&
-                        comment.replies_count > 0
-                    ) {
-
-                        repliesButton = `
-
-                <button
-                    type="button"
-                    class="show-replies-btn"
-                    data-post-id="${currentPostId}"
-                    data-comment-id="${comment.id}"
-                    data-replies-count="${comment.replies_count}"
-                >
-                    View ${comment.replies_count}
-                    ${
-                            comment.replies_count == 1
-                                ? 'reply'
-                                : 'replies'
-                        }
-                </button>
-
-            `;
-
-                    }
-
-
-                    let reportButton = '';
-
-
-                    if (
-                        CURRENT_USER_ID != comment.user.id
-                    ) {
-
-                        reportButton = `
-
-                <button
-                    type="button"
-                    class="dropdown-item report-btn"
-                    data-id="${comment.id}"
-                    data-type="comment"
-                    data-uid="${comment.user.id}"
-                >
-                    Report
-                </button>
-
-            `;
-
-                    }
-
-
-                    let deleteButton = '';
-
-
-                    if (
-                        CURRENT_USER_ID == comment.user.id ||
-                        CURRENT_USER_ID == currentPostUserId
-                    ) {
-
-                        deleteButton = `
-
-                <button
-                    type="button"
-                    class="dropdown-item delete-comment"
-                    data-id="${comment.id}"
-                    data-uid="${comment.user.id}"
-                    data-post-id="${currentPostId}"
-                    data-post-uid="${currentPostUserId}"
-                >
-                    Delete
-                </button>
-
-            `;
-
-                    }
-
-
-                    const html = `
-
-            <div
-                class="modal-comment-item"
-                data-comment-id="${comment.id}"
-            >
-
-                <a href="/profile/${encodeURIComponent(comment.user.username)}">
-
-                    <img
-                        src="${avatar}"
-                        class="modal-comment-avatar"
-                        alt="${escapeHtml(comment.user.username)}"
-                    >
-
-                </a>
-
-
-                <div class="modal-comment-content">
-
-                    <div class="modal-comment-top">
-
-                        <a
-                            href="/profile/${encodeURIComponent(comment.user.username)}"
-                            class="modal-comment-username"
-                        >
-                            ${escapeHtml(comment.user.username)}
-                        </a>
-
-                        ${verifiedIcon}
-
-                    </div>
-
-
-                    <div class="modal-comment-text">
-
-                        ${escapeHtml(comment.content)}
-
-                    </div>
-
-
-                    <div class="modal-comment-meta">
-
-                        <span class="modal-comment-time">
-                            ${escapeHtml(
-                        comment.created_at || 'Just now'
-                    )}
-                        </span>
-
-
-                        <button
-                            type="button"
-                            class="modal-reply-btn"
-                            data-comment-id="${comment.id}"
-                            data-username="${escapeHtml(comment.user.username)}"
-                        >
-                            Reply
-                        </button>
-
-                    </div>
-
-
-                    ${repliesButton}
-
-                </div>
-
-
-                <div class="modal-comment-menu">
-
-                    <button
-                        type="button"
-                        class="modal-three-dot"
-                    >
-
-                        <svg
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-
-                            <circle cx="12" cy="5" r="2"/>
-                            <circle cx="12" cy="12" r="2"/>
-                            <circle cx="12" cy="19" r="2"/>
-
-                        </svg>
-
-                    </button>
-
-
-                    <div class="modal-comment-dropdown">
-
-                        ${reportButton}
-
-                        ${deleteButton}
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        `;
-
-
-                    $('#modalCommentsList')
-                        .prepend(html);
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | SEND REPLY
-                |--------------------------------------------------------------------------
-                */
-
-                function sendReply(
-                    content,
-                    $button,
-                    $input
-                ) {
-
-                    const parentCommentId =
-                        replyingToCommentId;
-
-
-                    $button
-                        .prop('disabled', true)
-                        .text('Replying...');
-
-
-                    $.ajax({
-
-                        url:
-                            `/post/${currentPostId}/${parentCommentId}/sendCommentReply`,
-
-                        method: 'POST',
-
-                        data: {
-
-                            _token:
-                                $('meta[name="csrf-token"]').attr(
-                                    'content'
-                                ),
-
-                            reply: content
-
-                        },
-
-
-                        success: function (response) {
-
-                            if (!response.success) {
-                                return;
-                            }
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Your backend returns:
-                            |
-                            | response.reply
-                            |--------------------------------------------------------------------------
-                            */
-
-                            const reply = response.reply;
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Find parent comment/reply
-                            |--------------------------------------------------------------------------
-                            */
-
-                            let $repliesContainer =
-                                $(
-                                    `.modal-comment-item[data-comment-id="${parentCommentId}"]`
-                                ).find('.comment-replies').first();
-
-
-                            if (!$repliesContainer.length) {
-
-                                $repliesContainer =
-                                    $(
-                                        `.modal-reply-item[data-comment-id="${parentCommentId}"]`
-                                    ).closest('.comment-replies');
-
-                            }
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | If replies aren't open yet,
-                            | create the container.
-                            |--------------------------------------------------------------------------
-                            */
-
-                            if (!$repliesContainer.length) {
-
-                                const $parentComment =
-                                    $(
-                                        `.modal-comment-item[data-comment-id="${parentCommentId}"]`
-                                    );
-
-
-                                if ($parentComment.length) {
-
-                                    $repliesContainer = $(`
-                            <div
-                                class="comment-replies"
-                                data-comment-id="${parentCommentId}"
-                            ></div>
-                        `);
-
-
-                                    $parentComment
-                                        .find('.modal-comment-content')
-                                        .append($repliesContainer);
-
-                                }
-
-                            }
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Append the new reply
-                            |--------------------------------------------------------------------------
-                            */
-
-                            if ($repliesContainer.length) {
-
-                                appendReply(
-                                    $repliesContainer,
-                                    reply
-                                );
-
-                            }
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Update reply counter
-                            |--------------------------------------------------------------------------
-                            */
-
-                            const $parent =
-                                $(
-                                    `.modal-comment-item[data-comment-id="${parentCommentId}"]`
-                                );
-
-
-                            const $showReplies =
-                                $parent.find('.show-replies-btn');
-
-
-                            if ($showReplies.length) {
-
-                                let count =
-                                    parseInt(
-                                        $showReplies
-                                            .data('replies-count')
-                                    ) || 0;
-
-
-                                count++;
-
-
-                                $showReplies
-                                    .data(
-                                        'replies-count',
-                                        count
-                                    )
-                                    .text(
-                                        `View ${count} ${
-                                            count === 1
-                                                ? 'reply'
-                                                : 'replies'
-                                        }`
-                                    );
-
-                            }
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Clear reply mode
-                            |--------------------------------------------------------------------------
-                            */
-
-                            resetReplyState();
-
-
-                            $input.focus();
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Total post comment count
-                            |--------------------------------------------------------------------------
-                            */
-
-                            updatePostCommentCount(
-                                currentPostId,
-                                1
-                            );
-
-                        },
-
-
-                        error: handleAjaxError,
-
-
-                        complete: function () {
-
-                            $button
-                                .prop('disabled', false)
-                                .text('Post');
-
-                        }
-
-                    });
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | LOAD MORE REPLIES
-                |--------------------------------------------------------------------------
-                */
 
                 $(document).on(
                     'click',
-                    '.load-more-replies',
+                    '.show-replies-btn',
                     function (e) {
 
                         e.preventDefault();
 
+                        const $button =
+                            $(this);
 
-                        const $button = $(this);
-
-
-                        const postId =
-                            $button.data('post-id');
-
-
-                        const commentId =
+                        const parentId =
                             $button.data('comment-id');
 
+                        const $parent =
+                            $button.closest(
+                                '.modal-comment-item, .modal-reply-item'
+                            );
 
-                        const currentPage =
-                            parseInt(
-                                $button.data('page')
-                            ) || 1;
-
-
-                        const nextPage =
-                            currentPage + 1;
-
-
-                        const $container =
-                            $button.closest('.comment-replies');
-
-
-                        $button
-                            .prop('disabled', true)
-                            .text('Loading...');
-
+                        if (
+                            repliesLoaded[parentId] &&
+                            !repliesLoaded[parentId].hasMore
+                        ) {
+                            return;
+                        }
 
                         loadReplies(
-                            postId,
-                            commentId,
-                            nextPage,
-                            $container,
-                            $button
+                            parentId,
+                            $parent
                         );
-
                     }
                 );
 
+                $(document).on(
+                    'click',
+                    '#cancelReply',
+                    function () {
+                        cancelReply();
+                    }
+                );
 
-                /*
-                |--------------------------------------------------------------------------
-                | LOAD REPLIES
-                |--------------------------------------------------------------------------
-                */
+                $(document).on(
+                    'click',
+                    '#modalSubmitComment',
+                    function (e) {
 
-                function loadReplies(
-                    postId,
-                    commentId,
-                    page,
-                    $container,
-                    $button = null
-                ) {
+                        e.preventDefault();
 
-                    $.ajax({
-
-                        url:
-                            `/post/${postId}/comment/${commentId}/replies`,
-
-                        method: 'GET',
-
-                        data: {
-                            page: page
-                        },
-
-
-                        success: function (response) {
-
-                            if (!response.status) {
-                                return;
-                            }
-
-
-                            response.replies.forEach(
-                                function (reply) {
-
-                                    appendReply(
-                                        $container,
-                                        reply
-                                    );
-
-                                }
-                            );
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Remove old button
-                            |--------------------------------------------------------------------------
-                            */
-
-                            $container
-                                .find('.load-more-replies')
-                                .remove();
-
-
-                            /*
-                            |--------------------------------------------------------------------------
-                            | Add another button if needed
-                            |--------------------------------------------------------------------------
-                            */
-
-                            if (response.has_more) {
-
-                                $container.append(`
-
-                        <button
-                            type="button"
-                            class="load-more-replies"
-                            data-post-id="${postId}"
-                            data-comment-id="${commentId}"
-                            data-page="${response.current_page}"
-                        >
-                            View more replies
-                        </button>
-
-                    `);
-
-                            }
-
-                        },
-
-
-                        error: function (xhr) {
-
-                            console.error(
-                                'Replies loading error:',
-                                xhr.responseText
-                            );
-
-
-                            if ($button) {
-
-                                $button
-                                    .prop('disabled', false)
-                                    .text('View more replies');
-
-                            }
-
+                        if (replyingToId) {
+                            submitReply();
+                        } else {
+                            submitComment();
                         }
+                    }
+                );
 
-                    });
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | ENTER KEY
-                |--------------------------------------------------------------------------
-                */
-
-                $('#modalCommentInput').on(
+                $(document).on(
                     'keypress',
+                    '#modalCommentInput',
                     function (e) {
 
                         if (e.which === 13) {
@@ -2756,219 +1850,143 @@
 
                             $('#modalSubmitComment')
                                 .click();
-
                         }
-
                     }
                 );
 
-
-                /*
-                |--------------------------------------------------------------------------
-                | UPDATE COMMENT COUNT
-                |--------------------------------------------------------------------------
-                */
-
-                function updatePostCommentCount(
-                    postId,
-                    amount
-                ) {
-
-                    const $count =
-                        $(
-                            `.comments-count[data-post-id="${postId}"]`
-                        ).find('.comment-count-number');
-
-
-                    if (!$count.length) {
-                        return;
-                    }
-
-
-                    let currentCount =
-                        parseInt(
-                            $count.text()
-                        ) || 0;
-
-
-                    currentCount += amount;
-
-
-                    if (currentCount < 0) {
-
-                        currentCount = 0;
-
-                    }
-
-
-                    $count.text(currentCount);
-
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | CLOSE MODAL
-                |--------------------------------------------------------------------------
-                */
-
-                $('#closeCommentsModal').on(
-                    'click',
+                $('.comments-modal-body').on(
+                    'scroll',
                     function () {
 
-                        closeCommentsModal();
-
-                    }
-                );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | CLICK OUTSIDE MODAL
-                |--------------------------------------------------------------------------
-                */
-
-                $('#commentsModal').on(
-                    'click',
-                    function (e) {
-
-                        if (e.target === this) {
-
-                            closeCommentsModal();
-
-                        }
-
-                    }
-                );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | ESCAPE
-                |--------------------------------------------------------------------------
-                */
-
-                $(document).on(
-                    'keydown',
-                    function (e) {
+                        const element = this;
 
                         if (
-                            e.key === 'Escape' &&
-                            $('#commentsModal').hasClass('active')
+                            element.scrollTop +
+                            element.clientHeight >=
+                            element.scrollHeight - 100
                         ) {
 
-                            closeCommentsModal();
-
+                            if (
+                                !commentsLoading &&
+                                commentsHasMore
+                            ) {
+                                loadComments();
+                            }
                         }
-
                     }
                 );
 
+            });
+            $(document).on('click', '.delete-comment', function (e) {
 
-                function closeCommentsModal() {
+                e.preventDefault();
+                e.stopPropagation();
 
-                    $('#commentsModal')
-                        .removeClass('active');
+                const $button = $(this);
 
+                const commentId = $button.data('id');
+                const postId = $button.data('post-id');
 
-                    currentPostId = null;
-
-                    currentPostUserId = null;
-
-                    currentCommentsPage = 1;
-
-                    commentsHasMore = false;
-
-                    commentsLoading = false;
-
-                    replyingToCommentId = null;
-
-
-                    resetReplyState();
-
-
-                    $('.modal-comment-dropdown')
-                        .removeClass('active');
-
+                if (!commentId || !postId) {
+                    console.error('Missing comment ID or post ID');
+                    return;
                 }
 
+                if (!confirm('Delete this comment?')) {
+                    return;
+                }
 
-                /*
-                |--------------------------------------------------------------------------
-                | AJAX ERROR HANDLER
-                |--------------------------------------------------------------------------
-                */
+                $button.prop('disabled', true).text('Deleting...');
 
-                function handleAjaxError(xhr) {
+                $.ajax({
+                    url: '/post/' + postId + '/comment/' + commentId + '/delete',
+                    method: 'POST',
 
-                    if (xhr.status === 422) {
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
 
-                        const errors =
-                            xhr.responseJSON.errors;
+                    success: function (response) {
 
-                        let errorMessage = '';
-
-
-                        for (let field in errors) {
-
-                            errorMessage +=
-                                errors[field].join('\n') +
-                                '\n';
-
+                        if (!response.success) {
+                            alert(response.message || 'Could not delete comment.');
+                            return;
                         }
 
+                        const $comment =
+                            $('[data-comment-id="' + commentId + '"]').first();
 
-                        alert(errorMessage);
+                        $comment.fadeOut(250, function () {
+                            $(this).remove();
+                        });
 
-                    }
-                    else if (xhr.status === 401) {
+                        $('.modal-comment-dropdown')
+                            .removeClass('active');
 
-                        alert('Please login');
+                        const $count =
+                            $('.comments-count[data-post-id="' + postId + '"]')
+                                .find('.comment-count-number');
 
-                    }
-                    else if (xhr.status === 403) {
+                        if ($count.length) {
 
-                        alert('You are not allowed to do this.');
+                            let current =
+                                parseInt($count.text()) || 0;
 
-                    }
-                    else if (xhr.status === 500) {
+                            if (current > 0) {
+                                $count.text(current - 1);
+                            }
+                        }
+                    },
 
-                        alert('An error occurred.');
+                    error: function (xhr) {
 
                         console.error(
-                            'Server Error:',
+                            'Delete error:',
                             xhr.responseText
                         );
 
+                        if (xhr.status === 403) {
+                            alert('You are not allowed to delete this comment.');
+                        } else if (xhr.status === 404) {
+                            alert('Comment not found.');
+                        } else if (xhr.status === 401) {
+                            alert('Please login.');
+                        } else {
+                            alert('An error occurred while deleting the comment.');
+                        }
+                    },
+
+                    complete: function () {
+                        $button
+                            .prop('disabled', false)
+                            .text('Delete');
                     }
+                });
+            });
+            document.addEventListener("click", function (e) {
 
-                }
+                const btn = e.target.closest(".report-btn, .report-comment-btn");
 
+                if (!btn) return;
 
-                /*
-                |--------------------------------------------------------------------------
-                | ESCAPE HTML
-                |--------------------------------------------------------------------------
-                */
+                e.preventDefault();
+                e.stopPropagation();
 
-                function escapeHtml(value) {
+                document.getElementById("reported-user-id").value =
+                    btn.dataset.id;
 
-                    if (
-                        value === null ||
-                        value === undefined
-                    ) {
+                document.getElementById("report-type").value =
+                    btn.dataset.type;
 
-                        return '';
+                document.getElementById("reporter-uid").value =
+                    btn.dataset.uid;
 
-                    }
+                document.querySelectorAll(".modal-comment-dropdown")
+                    .forEach(function (dropdown) {
+                        dropdown.classList.remove("active");
+                    });
 
-
-                    return $('<div>')
-                        .text(value)
-                        .html();
-
-                }
-
+                reportModal.style.display = "flex";
             });
         </script>
 @endsection

@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    console.log(this.dataset);
     document.querySelectorAll('.delete-comment').forEach(button => {
 
         button.addEventListener('click', function (e) {

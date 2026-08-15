@@ -238,13 +238,20 @@ class postServices
             return response()->json([
                 'success' => true,
                 'comment' => [
+                    'id' => $comment->id,
                     'content' => $comment->content,
                     'created_at' => $comment->created_at->diffForHumans(),
+                    'user_id' => $comment->user_id,
                     'user' => [
-                        'name' => $comment->user->username,
+                        'username' => $comment->user->username,
                         'avatar' => $comment->user->avatar,
-                        ''
-                    ]
+                        'role' => $comment->user->role,
+                    ],
+                    'can_report' => auth()->id() != $comment->user_id,
+                    'can_delete' =>
+                        auth()->id() == $comment->user_id ||
+                        auth()->id() == $comment->post->user_id,
+                    'replies_count' => 0,
                 ]
             ]);
         }
@@ -258,7 +265,13 @@ class postServices
             ->where('reply_comment_id', $commentId)
             ->where('type', 'reply')
             ->orderBy('created_at', 'asc')
-            ->with('user:id,username,avatar,role')
+            ->with([
+                'user:id,username,avatar,role',
+                'post:id,user_id',
+            ])
+            ->withCount([
+                'replies as replies_count'
+            ])
             ->paginate(15);
 
         $repliesData = $replies->getCollection()->map(function ($reply) {
@@ -266,6 +279,13 @@ class postServices
             $data = $reply->toArray();
 
             $data['created_at'] = $reply->created_at->diffForHumans();
+
+            $data['can_report'] =
+                auth()->id() != $reply->user_id;
+
+            $data['can_delete'] =
+                auth()->id() == $reply->user_id ||
+                auth()->id() == $reply->post->user_id;
 
             return $data;
         });
@@ -289,21 +309,39 @@ class postServices
             'type' => $data['type'],
         ]);
 
-        $commentReply->load('user');
-        if($commentReply){
-            postModel::where('id', $data['post_id'])->increment('post_comments');
+        $commentReply->load('user:id,username,avatar,role');
+
+        $commentReply->loadCount([
+            'replies as replies_count'
+        ]);
+
+        if ($commentReply) {
+
+            postModel::where('id', $data['post_id'])
+                ->increment('post_comments');
+
             return response()->json([
                 'success' => true,
                 'reply' => [
                     'id' => $commentReply->id,
+                    'reply_comment_id' => $commentReply->reply_comment_id,
                     'content' => $commentReply->content,
                     'created_at' => $commentReply->created_at->diffForHumans(),
+
+                    'replies_count' => $commentReply->replies_count,
+
+                    'can_report' => auth()->id() != $commentReply->user_id,
+
+                    'can_delete' =>
+                        auth()->id() == $commentReply->user_id ||
+                        auth()->id() == $commentReply->post->user_id,
+
                     'user' => [
                         'id' => $commentReply->user->id,
-                        'name' => $commentReply->user->username,
+                        'username' => $commentReply->user->username,
                         'avatar' => $commentReply->user->avatar,
                         'role' => $commentReply->user->role,
-                    ]
+                    ],
                 ]
             ]);
         }
@@ -319,31 +357,65 @@ class postServices
 
         $post = postModel::find($data['post_id']);
 
-        if (
-            auth()->id() == $comment->user_id ||
-            auth()->id() == $post->user_id
-        ) {
-            $DeletedComment = $comment->delete();
-
-            if ($DeletedComment) {
-
-                $post->decrement('post_comments');
-
-                return response()->json([
-                    'success' => true,
-                    'commentCount' => -1,
-                ]);
-            }
-
+        if (!$comment || !$post) {
             return response()->json([
                 'success' => false,
+                'message' => 'Comment or post not found.',
+            ], 404);
+        }
+
+        if (
+            auth()->id() != $comment->user_id &&
+            auth()->id() != $post->user_id
+        ) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot delete this comment.',
+            ], 403);
+        }
+
+        $deletedReplies = $this->DeleteCommentReply($comment->id);
+
+        $deletedComment = $comment->delete();
+
+        if ($deletedComment) {
+
+            $totalDeleted = 1 + $deletedReplies;
+
+            $post->decrement(
+                'post_comments',
+                $totalDeleted
+            );
+
+            return response()->json([
+                'success' => true,
+                'commentCount' => -$totalDeleted,
+                'replies_count' => $deletedReplies,
             ]);
         }
 
         return response()->json([
             'success' => false,
-            'message' => 'You cannot delete this comment.',
-        ], 403);
+        ]);
+    }
+    public function DeleteCommentReply($parentId)
+    {
+        $replies = commentModel::where('type', 'reply')
+            ->where('reply_comment_id', $parentId)
+            ->get();
+
+        $deletedCount = 0;
+
+        foreach ($replies as $reply) {
+
+            $deletedCount += $this->DeleteCommentReply($reply->id);
+
+            $reply->delete();
+
+            $deletedCount++;
+        }
+
+        return $deletedCount;
     }
     public function LikePost($user , $post)
     {
