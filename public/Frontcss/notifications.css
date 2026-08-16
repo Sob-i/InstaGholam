@@ -249,6 +249,10 @@ nav {
     background: var(--accent2);
 }
 
+.badge-reply {
+    background: cornflowerblue;
+}
+
 .badge-follow {
     background: var(--accent);
     color: #0a0a0a;

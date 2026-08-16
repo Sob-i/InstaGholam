@@ -22,7 +22,6 @@ class profileServices
     {
 
     }
-
     private function CanViewProfile(User $viewer, User $owner)
     {
         if ($viewer->id == $owner->id)

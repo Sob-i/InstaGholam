@@ -17,15 +17,31 @@ class commentObserver
      */
     public function created(commentModel $commentModel): void
     {
-        $post = $commentModel->post;
-        $data = [
-            'user_id' => Auth::user()->id,
-            'post_id' => $post->id,
-            'target_user_id' => $post->user_id,
-            'type' => 'comment',
-            'message' => " commented : '$commentModel->content' "
-        ];
-        $this->notificationsServices->SendNotification($data);
+        if ($commentModel->type == 'reply')
+        {
+            $target = commentModel::where('id',$commentModel->reply_comment_id)->first();
+            $data = [
+                'user_id' => Auth::user()->id,
+                'post_id' => $commentModel->post->id,
+                'target_user_id' => $target->user_id,
+                'type' => 'reply',
+                'message' => " replied : '$commentModel->content' to your comment : '$target->content'  "
+            ];
+
+            $this->notificationsServices->SendNotification($data);
+        }else{
+            $post = $commentModel->post;
+            $data = [
+                'user_id' => Auth::user()->id,
+                'post_id' => $post->id,
+                'target_user_id' => $post->user_id,
+                'type' => 'comment',
+                'message' => " commented : '$commentModel->content' "
+            ];
+
+            $this->notificationsServices->SendNotification($data);
+        }
+
     }
 
     /**

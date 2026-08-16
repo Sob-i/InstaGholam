@@ -56,7 +56,7 @@ class notificationsServices
     }
     public function NotificationData($user)
     {
-        $notifications = notificationModel::where('target_user_id' , $user->id)->with(['user:id,username,avatar,email', 'targetUser' ,'post'])->orderBy('created_at', 'desc')->get();
+        $notifications = notificationModel::where('target_user_id' , $user->id)->with(['user:id,username,avatar,email', 'targetUser' ,'post.user'])->orderBy('created_at', 'desc')->get();
         $newNotifications = collect();
         $oldNotifications = collect();
 

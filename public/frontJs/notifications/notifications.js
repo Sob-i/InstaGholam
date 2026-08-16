@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         type = "likes";
                     } else if (item.querySelector(".badge-comment")) {
                         type = "comments";
+                    }else if (item.querySelector(".badge-reply")) {
+                        type = "replies";
                     } else if (item.querySelector(".badge-follow") || item.querySelector(".custom-a")) {
                         type = "follows";
                     } else if (item.querySelector(".badge-tag")) {

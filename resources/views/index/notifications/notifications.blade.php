@@ -8,6 +8,7 @@
             <button class="ftab active">All</button>
             <button class="ftab">Likes</button>
             <button class="ftab">Comments</button>
+            <button class="ftab">Replies</button>
             <button class="ftab">Follows</button>
             <button class="ftab">Mentions</button>
         </div>
@@ -21,7 +22,7 @@
                         $firstFile = strtok($notification->post->post_files, ',');
                         $fileExtension = strtolower(pathinfo($firstFile, PATHINFO_EXTENSION));
                         $isVideo = in_array($fileExtension, ['mp4', 'mov', 'avi', 'webm']);
-                        $postPath = 'users/posts/' . strstr($notification->targetUser->email, '@', true) . '-posts/' . $notification->post->created_at->format('Y-m-d') . '/' . $firstFile;
+                        $postPath = 'users/posts/' . strstr($notification->post->user->email, '@', true) . '-posts/' . $notification->post->created_at->format('Y-m-d') . '/' . $firstFile;
                     }
                 @endphp
                 <div class="notif-item unread">
@@ -30,6 +31,8 @@
                             <div class="notif-badge badge-heart">♥</div>
                         @elseif($notification->type == 'comment')
                             <div class="notif-badge badge-comment">💬</div>
+                        @elseif($notification->type == 'reply')
+                            <div class="notif-badge badge-reply">↪</div>
                         @elseif($notification->type == 'tagged')
                             <div class="notif-badge badge-tag">🏷</div>
                         @elseif($notification->type == 'follow')
