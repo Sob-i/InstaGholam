@@ -97,6 +97,7 @@ Route::middleware('auth')->group(function () {
     });
 
 Route::middleware('role:admin')->group(function () {
+
     Route::prefix('admin')->group(function () {
 
         // Dashboard
@@ -121,7 +122,7 @@ Route::middleware('role:admin')->group(function () {
         Route::get('reports', [adminDashboardController::class, 'showReports'])->name('admin.reports');
 
     });
-});
 
+});
 
 });

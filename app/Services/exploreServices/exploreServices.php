@@ -17,38 +17,10 @@ class exploreServices
     {
 
     }
-    public function Explore($request,$user)
+    public function Explore($user)
     {
-        $search = $request->input('search');
         $savedPosts = postsSaveModel::with('post')->orderBy('created_at', 'desc')->get();
-        if ($search) {
-            $posts =  postModel::where('post_audience', 'everyone')
-                ->where(function($query) use ($search) {
-                    $query->where('post_tags', 'like', '%' . $search . '%')
-                        ->orWhere('post_location', 'like', '%' . $search . '%');
-                })
-                ->with('user', 'comments')
-                ->orderBy('created_at', 'desc')
-                ->paginate(20);
-
-            $postsCount = $posts->count();
-            $isFollowed [] = false;
-            if ($user) {
-                foreach ($posts as $post) {
-                    $isFollowed = followsModel::where('follower_id', $user->id)
-                        ->where('followed_id', $post->user_id)
-                        ->exists();
-                    $isFollowed = true;
-                }
-                return [
-                    'posts' => $posts,
-                    'postsCount' => $postsCount,
-                    'isFollowed' => $isFollowed,
-                    'savedPosts' => $savedPosts,
-                ];
-            }
-        } else {
-            $posts = PostModel::where('post_audience','everyone')->orderBy('created_at', 'desc')->get();
+            $posts = PostModel::where('post_audience','everyone')->orderBy('created_at', 'desc')->paginate(20);
             $postsCount = $posts->count();
             $isFollowed [] = false;
             if ($user) {
@@ -65,7 +37,6 @@ class exploreServices
                 'isFollowed' => $isFollowed,
                 'savedPosts' => $savedPosts,
             ];
-        }
     }
     public function ExploreSearch($request)
     {
