@@ -11,21 +11,19 @@
     const followLoading = document.getElementById('followLoading');
     const followError = document.getElementById('followError');
 
-
     followersButton.addEventListener('click', function () {
-    openFollowModal(
-        'Followers',
-        "{{ route('profile.followers.show' , $user->username) }}"
-    );
-});
-
+        openFollowModal(
+            'Followers',
+            FollowersUrl
+        );
+    });
 
     followingButton.addEventListener('click', function () {
-    openFollowModal(
-        'Following',
-        "{{ route('profile.followings.show', $user->username) }}"
-    );
-});
+        openFollowModal(
+            'Following',
+            FollowingsUrl
+        );
+    });
 
 
     async function openFollowModal(title, url) {

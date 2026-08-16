@@ -76,6 +76,7 @@ class exploreServices
                     ->orWhere('post_location', 'like', '%' . $search . '%');
             })
             ->with('user','comments')
+            ->latest()
             ->get();
         $users = User::where('username', 'like', '%' . $search . '%')->get();
 

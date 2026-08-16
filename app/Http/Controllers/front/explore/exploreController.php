@@ -22,7 +22,6 @@ class exploreController extends Controller
         $data = $this->exploreServices->Explore($request,$user);
         return view('index.explore.explore',compact('data'));
     }
-
     public function search(Request $request)
     {
        return $this->exploreServices->ExploreSearch($request);

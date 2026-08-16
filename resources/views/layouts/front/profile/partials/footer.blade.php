@@ -55,6 +55,10 @@
         url('post')
     );
 </script>
+<script>
+    const FollowersUrl = @json(route('profile.followers.show', $user->username));
+    const FollowingsUrl = @json(route('profile.followings.show', $user->username));
+</script>
 <script src="{{asset('frontJs/profile/savedTab.js')}}"></script>
 <script src="{{asset('frontJs/profile/follow.js')}}"></script>
 <script src="{{asset('frontJs/profile/followingAndFollowsModal.js')}}"></script>
